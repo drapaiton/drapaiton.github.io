@@ -24,12 +24,6 @@ provider:
   iam:
     role:
       name: drapaiton-portfolio-user
-      statements:
-        - Effect: 'Allow'
-          Action:
-            - dynamodb:*
-          Resource: '*'
-#          NotAction: 'iam:DeleteUser'
 
 #  apiKeys: # List of API keys to be used by your service API Gateway REST API
 #    - myFirstKey
@@ -57,15 +51,30 @@ provider:
         Condition:
           IpAddress:
             aws:SourceIp:
-              - '187.188.8.125'
+              - '*'
 
 functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: echo/hello
-          method: get
+    websocket-connect:
+        handler: lambdas/websockets/connect.handler
+        events:
+            - websocket:
+                  route: $connect
+    websocket-disconnect:
+        handler: lambdas/websockets/disconnect.handler
+        events:
+            - websocket:
+                  route: $disconnect
+    websocket-default:
+        handler: lambdas/websockets/default.handler
+        events:
+            - websocket:
+                  route: $default
+    websocket-message:
+        handler: lambdas/websockets/message.handler
+        events:
+            - websocket:
+                  route: message
+
 
 
 resources:
@@ -73,15 +82,3 @@ resources:
     Description: >
       PUB-SUB model implementation
       for a simple chat webapp application
-    Resources:
-        WeboscketUserTable:
-            Type: AWS::DynamoDB::Table
-            Properties:
-                TableName: ${self:custom.tableName}
-                AttributeDefinitions:
-                    - AttributeName: ID
-                      AttributeType: S
-                KeySchema:
-                    - AttributeName: ID
-                      KeyType: HASH
-                BillingMode: PAY_PER_REQUEST
