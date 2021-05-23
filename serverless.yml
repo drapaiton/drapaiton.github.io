@@ -1,0 +1,39 @@
+org: drapaiton
+app: drapaiton-portfolio
+description: >
+  PUB-SUB model implementation
+  for a simple chat webapp application
+
+frameworkVersion: '2'
+service: pubsub-model
+
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        CM_URL: 'nothing'
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-2
+  memorySize: 128
+  lambdaHashingVersion: 20201221
+  stage: dev
+
+  iam:
+    role:
+      name: drapaiton-portfolio-user
+      statements:
+        - Effect: 'Allow'
+          Resource: '*'
+          NotAction: 'iam:DeleteUser'
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: echo/hello
+          method: get
