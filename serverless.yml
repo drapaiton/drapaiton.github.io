@@ -1,18 +1,13 @@
 org: drapaiton
 app: drapaiton-portfolio
-description: >
-  PUB-SUB model implementation
-  for a simple chat webapp application
+useDotenv: true
 
 frameworkVersion: '2'
 service: pubsub-model
 
-Globals:
-  Function:
-    Timeout: 3
-    Environment:
-      Variables:
-        CM_URL: 'nothing'
+custom:
+  tableName: WebsocketUsers
+
 
 provider:
   name: aws
@@ -21,14 +16,48 @@ provider:
   memorySize: 128
   lambdaHashingVersion: 20201221
   stage: dev
+  timeout: 5
+
+  environment: # Service wide environment variables
+    CM_URL: 'nothing'
 
   iam:
     role:
       name: drapaiton-portfolio-user
       statements:
         - Effect: 'Allow'
+          Action:
+            - dynamodb:*
           Resource: '*'
-          NotAction: 'iam:DeleteUser'
+#          NotAction: 'iam:DeleteUser'
+
+#  apiKeys: # List of API keys to be used by your service API Gateway REST API
+#    - myFirstKey
+#      value: myFirstKeyValue
+#      description: myFirstKeyDescription
+#      customerId: myFirstKeyCustomerId
+#    - ${opt:stage}-myFirstKey
+#    - ${env:MY_API_KEY} # you can hide it in a serverless variable
+
+#  usagePlan: # Optional usage plan configuration
+#    quota:
+#      limit: 5000
+#      offset: 2
+#      period: MONTH
+#    throttle:
+#      burstLimit: 200
+#      rateLimit: 100
+  apiGateway:
+    resourcePolicy:
+      - Effect: Allow
+        Principal: '*'
+        Action: execute-api:Invoke
+        Resource:
+          - execute-api:/*/*/*
+        Condition:
+          IpAddress:
+            aws:SourceIp:
+              - '187.188.8.125'
 
 functions:
   hello:
@@ -37,3 +66,22 @@ functions:
       - http:
           path: echo/hello
           method: get
+
+
+resources:
+    # CloudFormation stack description
+    Description: >
+      PUB-SUB model implementation
+      for a simple chat webapp application
+    Resources:
+        WeboscketUserTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:custom.tableName}
+                AttributeDefinitions:
+                    - AttributeName: ID
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: ID
+                      KeyType: HASH
+                BillingMode: PAY_PER_REQUEST
