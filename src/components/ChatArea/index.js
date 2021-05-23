@@ -2,6 +2,10 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
+import ChatInformation from "../ChatInformation";
+import ChatZone from "../ChatZone";
+import TextBox from "../TextBox";
+
 const useStyles = makeStyles((theme) => ({
   title: {
     height: "50px",
@@ -9,13 +13,21 @@ const useStyles = makeStyles((theme) => ({
   body: {
     height: "600px",
   },
-  footer: {
-    height: "50px",
-  },
+  footer: {},
 }));
 
 const ChatArea = () => {
   const classes = useStyles();
+
+  const onHandleChange = (event) => {
+    event.preventDefault();
+    console.log("Enter is pressed!", event);
+  };
+
+  const onHandleKeyDown = (event) => {
+    console.log(event.keyCode);
+  };
+
   return (
     <Grid
       container
@@ -24,13 +36,16 @@ const ChatArea = () => {
       alignItems="stretch"
     >
       <Grid item className={classes.title}>
-        uno
+        <ChatInformation />
       </Grid>
       <Grid item className={classes.body}>
-        dos
+        <ChatZone />
       </Grid>
       <Grid item className={classes.footer}>
-        tres
+        <TextBox
+          handleChange={(e) => onHandleChange(e)}
+          handleKeyDown={(e) => onHandleKeyDown(e)}
+        />
       </Grid>
     </Grid>
   );

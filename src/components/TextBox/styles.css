@@ -1,0 +1,12 @@
+
+.hannah-chat__container {
+  background-color: #1e2428;
+}
+
+.hannah-chat__input {
+  padding: 9px 12px 11px;
+  margin: 5px 10px;
+  background-color: #33383b;
+  border: 1px solid #1e2428;
+  border-radius: 21px;
+}

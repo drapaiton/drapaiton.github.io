@@ -17,10 +17,10 @@ const useStyles = makeStyles((theme) => ({
 const ChatContainer = () => {
   const classes = useStyles();
   return (
-    <Container fluid>
+    <Container>
       <Grid container spacing={3}>
         <Grid item xs={4} className={classes.root}></Grid>
-        <Grid item xs className={classes.grid}>
+        <Grid item xs>
           <ChatArea />
         </Grid>
       </Grid>
