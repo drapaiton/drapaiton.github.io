@@ -3,8 +3,12 @@ import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
 import InputBase from "@material-ui/core/InputBase";
 import { makeStyles } from "@material-ui/core/styles";
+import EmojiPicker from "emoji-picker-react";
+import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
+import SpeedDial from "../../containers/SpeedDial";
 
 import "./styles.css";
+import useEmoticons from "./hooks/useEmoticons";
 
 const useStyles = makeStyles((theme) => ({
   text: {
@@ -19,12 +23,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TextBox = ({ handleChange, handleKeyDown }) => {
+const TextBox = ({ handleChange, handleKeyDown, handleEmojiClick }) => {
+  const { showEmoticons, setEmoticons } = useEmoticons();
   const classes = useStyles();
+
   return (
-    <Grid container spacing={3} className="hannah-chat__container">
-      <Grid item xs></Grid>
-      <Grid item xs={11}>
+    <Grid container className="hannah-chat__container">
+      <Grid item xs={1}>
+        {(!showEmoticons && <SpeedDial />) || (
+          <EmojiPicker onEmojiClick={handleEmojiClick} />
+        )}
+      </Grid>
+      <Grid item xs>
         <InputBase
           onKeyDown={handleKeyDown}
           onChange={handleChange}
@@ -41,11 +51,13 @@ const TextBox = ({ handleChange, handleKeyDown }) => {
 TextBox.propTypes = {
   handleChange: PropTypes.func,
   handleKeyDown: PropTypes.func,
+  handleEmojiClick: PropTypes.func,
 };
 
 TextBox.defaultProps = {
   handleChange: () => {},
   handleKeyDown: () => {},
+  handleEmojiClick: () => {},
 };
 
 export default TextBox;

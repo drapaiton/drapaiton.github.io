@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import ChatContainer from "../components/ChatContainer";
 
-import useSocket from "./hooks/useSocket";
 const useStyles = makeStyles((theme) => ({
   outer: {
     display: "table",
@@ -24,8 +23,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const App = () => {
-  useSocket();
-
   const classes = useStyles();
   return (
     <div className={classes.outer}>

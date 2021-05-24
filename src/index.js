@@ -2,4 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./components/App.js";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+import MessagesState from "./context/messages/MessagesState";
+
+ReactDOM.render(
+  <MessagesState>
+    <App />
+  </MessagesState>,
+  document.getElementById("root")
+);

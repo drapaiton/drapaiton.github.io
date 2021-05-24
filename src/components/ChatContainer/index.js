@@ -18,7 +18,7 @@ const ChatContainer = () => {
   const classes = useStyles();
   return (
     <Container>
-      <Grid container spacing={3}>
+      <Grid container spacing={0}>
         <Grid item xs={4} className={classes.root}></Grid>
         <Grid item xs>
           <ChatArea />

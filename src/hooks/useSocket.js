@@ -21,12 +21,21 @@ const useSocket = () => {
 
     socket.current.onmessage = (e) => {
       if (isPaused) return;
-      const message = JSON.parse(e.data);
+      const message = e.data;
       console.log("e", message);
     };
   }, [isPaused]);
 
-  return null;
+  const handleSendMessage = (message) => {
+    socket.current.send(
+      JSON.stringify({
+        message: message,
+        action: "message",
+      })
+    );
+  };
+
+  return { handleSendMessage };
 };
 
 export default useSocket;

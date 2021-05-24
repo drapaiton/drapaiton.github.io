@@ -10,3 +10,15 @@
   border: 1px solid #1e2428;
   border-radius: 21px;
 }
+
+.hannah-chat__emojis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: aquamarine;
+}
+
+.hannah-chat__emojis:hover {
+  cursor: pointer;
+}

@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
-import ChatInformation from "../ChatInformation";
-import ChatZone from "../ChatZone";
 import TextBox from "../TextBox";
+import ChatZone from "../ChatZone";
+import ChatInformation from "../ChatInformation";
+import MessageContext from "../../context/messages/MessagesContext";
+
+import useMessages from "./hooks/useMessages";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -17,16 +20,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ChatArea = () => {
+  const { message, handleSetMessage } = useMessages();
+  const { sendMessage } = useContext(MessageContext);
   const classes = useStyles();
 
   const onHandleChange = (event) => {
     event.preventDefault();
-    console.log("Enter is pressed!", event);
+    handleSetMessage(event.target.value);
   };
 
   const onHandleKeyDown = (event) => {
-    console.log(event.keyCode);
+    if (event.keyCode === 13) {
+      handleSetMessage("");
+      sendMessage(message);
+    }
   };
+
+  const onHandleEmojiClick = (event) => {};
 
   return (
     <Grid
@@ -45,6 +55,7 @@ const ChatArea = () => {
         <TextBox
           handleChange={(e) => onHandleChange(e)}
           handleKeyDown={(e) => onHandleKeyDown(e)}
+          handleEmojiClick={(e) => onHandleEmojiClick(e)}
         />
       </Grid>
     </Grid>
