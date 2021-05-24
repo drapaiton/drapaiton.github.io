@@ -2,8 +2,5 @@
 from lambdas.common.ApiResponses import code_200
 
 
-async def handler(event: dict, *args, **kwargs):
-    print(f"received event:\n {event}")
-    print("-----")
-    print(*args, **kwargs)
+def handler(event: dict, ctx):
     return code_200({"message": "default"})

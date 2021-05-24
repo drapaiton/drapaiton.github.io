@@ -3,15 +3,12 @@ from lambdas.common import RedisManagers
 from lambdas.common.ApiResponses import code_200
 
 
-async def handler(event: dict, *args, **kwargs):
-    print(f"received event:\n {event}")
-    print("-----")
-    print(*args, **kwargs)
-
+def handler(event: dict, *args, **kwargs):
     request_ctx = event["requestContext"]
     connection_id = request_ctx["connectionId"]
 
-    with RedisManagers.Connections() as conn:
-        conn.delete_connection(connection_id)
+    conn = RedisManagers.Connections()
+    conn.delete_connection(connection_id)
+    conn.close()
 
     return code_200({"message": "disconnected"})

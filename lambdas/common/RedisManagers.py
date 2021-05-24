@@ -1,7 +1,10 @@
 # coding=utf-8
+import re
 from datetime import datetime
 from os import environ
 from json import dumps
+from typing import List
+
 import redis
 
 REDIS_HOST: str = environ["REDIS_HOST"]
@@ -12,10 +15,7 @@ REDIS_PORT: int = int(environ["REDIS_PORT"])
 class RedisRWModel:
     client: redis.Redis
 
-    def __enter__(self, *args, **kwargs):
-        ...
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def close(self):
         self.client.close()
 
     def __del__(self, *args, **kwargs):
@@ -55,18 +55,24 @@ class Connections(RedisRWModel):
         # keep history short
         PAYLOAD = {
             "connection_id": connection_id,
-            "date": datetime.now(),
+            "date": datetime.now().timestamp(),
             "domainName": domain_name,
             "stage": stage,
         }
         self.client.ltrim("VideoQueue", 0, self.QUEUE_MAXIMUM_SIZE)
-        self.client.lpush(self.LIST_NAME, PAYLOAD)
+        self.client.lpush(self.LIST_NAME, dumps(PAYLOAD))
 
     def delete_connection(self, connection_id):
-        REMOVE_ALL_COINCIDENCES = 0
-        self.client.lrem(
-            self.LIST_NAME, REMOVE_ALL_COINCIDENCES, connection_id
-        )
+        lon = self.client.llen(self.LIST_NAME)
+        CHUNK_SIZE = 10
+        for page in range(0, lon + 1, CHUNK_SIZE):
+            page_objects: List[bytes] = self.client.lrange(
+                self.LIST_NAME, page, page + CHUNK_SIZE
+            )
+            r = re.compile(connection_id)
+            for coincidence in filter(r.search, map(str, page_objects)):
+                REMOVE_ALL = 0
+                self.client.lrem(self.LIST_NAME, REMOVE_ALL, coincidence)
 
     def get_all_connection_id(self):
         return self.client.lrange(self.LIST_NAME, 0, self.QUEUE_MAXIMUM_SIZE)
