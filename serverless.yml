@@ -4,8 +4,16 @@ useDotenv: true
 
 frameworkVersion: '2'
 service: pubsub-model
-
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-python-requirements
 custom:
+  dotenv:
+    required:
+      env:
+        - REDIS_HOST
+        - REDIS_PORT
+        - REDIS_PASS
   tableName: WebsocketUsers
 
 
@@ -74,8 +82,6 @@ functions:
         events:
             - websocket:
                   route: message
-
-
 
 resources:
     # CloudFormation stack description
