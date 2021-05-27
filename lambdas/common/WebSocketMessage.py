@@ -1,4 +1,6 @@
 # coding=utf-8
+from typing import List
+
 import boto3
 from os import environ
 
@@ -13,6 +15,9 @@ def _create(domain_name: str, stage: str):
     )
 
 
-def send(domain_name: str, stage: str, connection_id: str, message: str):
+def send(
+    domain_name: str, stage: str, connection_ids: List[str], message: str
+):
     ws = _create(domain_name, stage)
-    return ws.post_to_connection(Data=message, ConnectionId=connection_id)
+    for _id in connection_ids:
+        ws.post_to_connection(Data=message, ConnectionId=_id)

@@ -1,21 +1,12 @@
-org: drapaiton
-app: drapaiton-portfolio
-useDotenv: true
+#org: drapaiton
+#app: drapaiton-portfolio
+useDotenv: false
 
 frameworkVersion: '2'
-service: pubsub-model
+service: pubsub-model-dev
 plugins:
   - serverless-dotenv-plugin
   - serverless-python-requirements
-custom:
-  dotenv:
-    required:
-      env:
-        - REDIS_HOST
-        - REDIS_PORT
-        - REDIS_PASS
-  tableName: WebsocketUsers
-
 
 provider:
   name: aws
@@ -26,29 +17,10 @@ provider:
   stage: dev
   timeout: 5
 
-  environment: # Service wide environment variables
-    CM_URL: 'nothing'
-
   iam:
     role:
       name: drapaiton-portfolio-user
 
-#  apiKeys: # List of API keys to be used by your service API Gateway REST API
-#    - myFirstKey
-#      value: myFirstKeyValue
-#      description: myFirstKeyDescription
-#      customerId: myFirstKeyCustomerId
-#    - ${opt:stage}-myFirstKey
-#    - ${env:MY_API_KEY} # you can hide it in a serverless variable
-
-#  usagePlan: # Optional usage plan configuration
-#    quota:
-#      limit: 5000
-#      offset: 2
-#      period: MONTH
-#    throttle:
-#      burstLimit: 200
-#      rateLimit: 100
   apiGateway:
     resourcePolicy:
       - Effect: Allow
@@ -82,9 +54,55 @@ functions:
         events:
             - websocket:
                   route: message
+    endpoint-register-user:
+        handler: lambdas/endpoints/register_user.handler
+        events: # The Events that trigger this Function
+          - http:
+              path: /register/{user}
+              integration: lambda
+              method: post
+              cors: true
+              private: false # Requires clients to add API keys values in the `x-api-key` header of their request
+              request:
+#                passThrough: WHEN_NO_MATCH
+                parameters:
+                  paths:
+                    user: true
+    endpoint-send-message:
+        handler: lambdas/endpoints/send_message.handler
+        events: # The Events that trigger this Function
+          - http:
+              path: /send
+              integration: lambda
+              method: post
+              cors: true
+              private: false # Requires clients to add API keys values in the `x-api-key` header of their request
+              request:
+                passThrough: WHEN_NO_MATCH
+                parameters:
+                  paths:
+                    user: true
+                template:
+                  application/json: '{ "username" : "", "message", "message_type","" }'
 
 resources:
     # CloudFormation stack description
     Description: >
       PUB-SUB model implementation
       for a simple chat webapp application
+    Resources:
+        WeboscketUserTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: WebSocketUsers
+                KeySchema:
+                    - AttributeName: username
+                      KeyType: HASH
+                    - AttributeName: event
+                      KeyType: HASH
+                AttributeDefinitions:
+                    - AttributeName: username
+                      AttributeType: S
+                    - AttributeName: event
+                      AttributeType: S
+                BillingMode: PAY_PER_REQUEST

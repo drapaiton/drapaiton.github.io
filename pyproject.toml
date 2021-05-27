@@ -6,7 +6,6 @@ authors = ["Sofia Escobedo <drapaiton@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-redis = "^3.5.3"
 boto3 = "^1.17.78"
 
 [tool.poetry.dev-dependencies]
