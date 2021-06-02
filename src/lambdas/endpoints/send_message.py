@@ -1,7 +1,11 @@
-from src.lambdas.common.ApiResponses import code_200, code_500
-from src.lambdas.common.DynamoCrud import WebSocketUsers
+from ..common.ApiResponses import code_200, code_500
+from ..common.DynamoCrud import WebSocketUsers
 
-MESSAGE_TYPES = ("message", "play_video")
+MESSAGE_TYPES = (
+    "MESSAGE",
+    "PLAY_VIDEO",
+)
+assert (i.isupper() for i in MESSAGE_TYPES)
 
 
 def handler(ctx, event):

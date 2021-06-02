@@ -1,5 +1,5 @@
-from src.lambdas.common.ApiResponses import code_200, code_422, code_500
-from src.lambdas.common.DynamoCrud import WebSocketUsers
+from ..common.ApiResponses import code_200, code_422, code_500
+from ..common.DynamoCrud import WebSocketUsers
 
 
 def handler(ctx, *args, **kwargs):
