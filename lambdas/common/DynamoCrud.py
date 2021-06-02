@@ -1,7 +1,10 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Any
 
+
 import boto3
+from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 
 from .config import logger
@@ -9,16 +12,25 @@ from .config import logger
 
 class WebSocketUsers:
     client: Any
-    TABLE = boto3.resource("dynamodb").Table("WebSocketUsers")
+    RES = boto3.resource("dynamodb")
+    ConditionalCheckFailedException = (
+        RES.meta.client.exceptions.ConditionalCheckFailedException
+    )
+    TABLE = RES.Table("WebSocketUsers")
 
     @classmethod
     def register_user(cls, username: str):
         PAYLOAD = {
             "username": username,
             "event": "registered",
-            "info.registered_since": datetime.now().timestamp(),
+            "info.registered_since": int(datetime.now().timestamp()),
         }
-        response = cls.TABLE.put_item(Item=PAYLOAD)
+        try:
+            response = cls.TABLE.put_item(
+                Item=PAYLOAD, ConditionExpression=Attr("username").not_exists()
+            )
+        except cls.ConditionalCheckFailedException:
+            raise ValueError("username already exists")
         return response
 
     @classmethod
