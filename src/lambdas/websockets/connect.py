@@ -1,5 +1,5 @@
 # coding=utf-8
-from lambdas.common.ApiResponses import code_200
+from src.lambdas.common.ApiResponses import code_200
 
 
 def handler(event: dict, ctx):

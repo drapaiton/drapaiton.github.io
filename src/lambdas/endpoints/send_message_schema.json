@@ -1,0 +1,10 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "username": {"type": "string", "pattern": "[a-zA-Z0-9]", "maxLength": 50},
+        "message": {"type": "string", "maxLength": 500},
+        "message_type": {"type": "string", "minLength": 1, "maxLength": 50,"pattern": "[A-Z]"}
+    },
+    "required": ["username", "message", "message_type"]
+}

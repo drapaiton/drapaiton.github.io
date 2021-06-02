@@ -46,7 +46,7 @@ functions:
               cors: false
               private: false # Requires clients to add API keys values in the `x-api-key` header of their request
               request:
-#                passThrough: WHEN_NO_MATCH
+                passThrough: WHEN_NO_MATCH
                 parameters:
                   paths:
                     user: true
@@ -61,11 +61,8 @@ functions:
               private: false # Requires clients to add API keys values in the `x-api-key` header of their request
               request:
                 passThrough: WHEN_NO_MATCH
-                parameters:
-                  paths:
-                    user: true
-                template:
-                  application/json: '{ "username" : "", "message", "message_type","" }'
+                schemas:
+                  application/json: ${file(lambdas/endpoints/send_message_schema.json)}
 
 resources:
     # CloudFormation stack description
