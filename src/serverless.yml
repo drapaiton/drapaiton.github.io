@@ -62,7 +62,7 @@ functions:
               request:
                 passThrough: WHEN_NO_MATCH
                 schemas:
-                  application/json: ${file(schemas/send_message_schema.json)}
+                  application/json: ${file(schemas/send_message.json)}
 
 resources:
     # CloudFormation stack description
