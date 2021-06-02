@@ -1,51 +1,32 @@
 # coding=utf-8
-from .common.ApiResponses import code_200
-from .common.config import logger
+from common.DynamoCrud import update_user
+from common.config import logger
+from common.models import (
+    CreatedResourceResponse,
+    ExceptionResponse,
+)
 
 
 def connect_handler(event: dict, ctx):
     logger.info(str(ctx) + str(event))
+    USERNAME = "drapaiton"
+    response = update_user(username=USERNAME, connected=True)
 
-    # request_ctx = event["requestContext"]
-    #
-    # connection_id = request_ctx["connectionId"]
-    # domain_name = request_ctx["domainName"]
-    # stage = request_ctx["stage"]
-    # conn = get_client()
-    # RedisManagers.Connections().add_connection(
-    #     connection_id, domain_name, stage, conn
-    # )
-    # conn.close()
-    #
-    return code_200({"message": "connected"})
+    return CreatedResourceResponse(message="connected", created=response)
 
 
 def default_handler(event: dict, ctx):
     logger.info(str(ctx) + str(event))
-    return code_200({"message": "default"})
+    return ExceptionResponse(error="UNKNOWN ERROR 500")
 
 
 def disconnect_handler(event: dict, ctx):
     logger.info(str(ctx) + str(event))
-
-    # request_ctx = event["requestContext"]
-    # connection_id = request_ctx["connectionId"]
-    #
-    # conn = get_client()
-    # RedisManagers.Connections().delete_connection(connection_id, conn)
-    # conn.close()
-
-    return code_200({"message": "disconnected"})
+    USERNAME = "drapaiton"
+    response = update_user(username=USERNAME, connected=False)
+    return CreatedResourceResponse(created=response, message="disconnected")
 
 
 def writing_handler(event: dict, ctx):
     logger.info(str(ctx) + str(event))
-
-    # request_ctx = event["requestContext"]
-    # connection_id = request_ctx["connectionId"]
-    #
-    # conn = get_client()
-    # RedisManagers.Connections().delete_connection(connection_id, conn)
-    # conn.close()
-
-    return code_200({"message": "writing"})
+    raise NotImplementedError()

@@ -1,4 +1,4 @@
-from .common.config import logger
+from common.config import logger
 
 
 def handler(ctx, event):
