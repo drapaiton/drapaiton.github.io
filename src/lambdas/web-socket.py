@@ -1,6 +1,6 @@
 # coding=utf-8
-from app.lambdas.common.ApiResponses import code_200
-from app.lambdas.common.config import logger
+from src.lambdas.common.ApiResponses import code_200
+from src.lambdas.common.config import logger
 
 
 def connect_handler(event: dict, ctx):

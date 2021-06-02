@@ -1,4 +1,4 @@
-from app.lambdas.common.config import logger
+from src.lambdas.common.config import logger
 
 
 def handler(ctx, event):
