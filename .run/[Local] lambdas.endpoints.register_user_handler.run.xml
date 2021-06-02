@@ -1,0 +1,32 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="[Local] lambdas/endpoints/register_user.handler" type="aws.lambda" factoryName="Local" nameIsGenerated="true">
+    <option name="credentialProviderId" value="profile:serverlessUser" />
+    <option name="regionId" value="us-east-2" />
+    <option name="debugHost" value="localhost" />
+    <option name="environmentVariables">
+      <map />
+    </option>
+    <option name="handler" value="lambdas/endpoints/register_user.handler" />
+    <option name="image" value="false" />
+    <option name="logicalFunctionName" />
+    <option name="memorySize" value="128" />
+    <option name="pathMappings">
+      <list />
+    </option>
+    <option name="platform" />
+    <option name="runtime" value="python3.8" />
+    <option name="templateFile" />
+    <option name="timeout" value="33" />
+    <option name="useTemplate" value="false" />
+    <option name="input" value="{&#10;    &quot;body&quot;: {},&#10;    &quot;method&quot;: &quot;POST&quot;,&#10;    &quot;principalId&quot;: &quot;&quot;,&#10;    &quot;stage&quot;: &quot;dev&quot;,&#10;    &quot;cognitoPoolClaims&quot;: {&#10;        &quot;sub&quot;: &quot;&quot;&#10;    },&#10;    &quot;enhancedAuthContext&quot;: {},&#10;    &quot;headers&quot;: {&#10;        &quot;Accept&quot;: &quot;*/*&quot;,&#10;        &quot;Accept-Encoding&quot;: &quot;gzip, deflate, br&quot;,&#10;        &quot;Authorization&quot;: &quot;Token d64c125201b2c865a5f5f8bd5c71009e30a839e6&quot;,&#10;        &quot;CloudFront-Forwarded-Proto&quot;: &quot;https&quot;,&#10;        &quot;CloudFront-Is-Desktop-Viewer&quot;: &quot;true&quot;,&#10;        &quot;CloudFront-Is-Mobile-Viewer&quot;: &quot;false&quot;,&#10;        &quot;CloudFront-Is-SmartTV-Viewer&quot;: &quot;false&quot;,&#10;        &quot;CloudFront-Is-Tablet-Viewer&quot;: &quot;false&quot;,&#10;        &quot;CloudFront-Viewer-Country&quot;: &quot;MX&quot;,&#10;        &quot;Host&quot;: &quot;1mmb20auqa.execute-api.us-east-2.amazonaws.com&quot;,&#10;        &quot;Postman-Token&quot;: &quot;59e57a6c-23d0-4c66-a4c2-5631ba3be1f9&quot;,&#10;        &quot;User-Agent&quot;: &quot;PostmanRuntime/7.26.8&quot;,&#10;        &quot;Via&quot;: &quot;1.1 6199012107c3f6a6ba17743c8bff0a48.cloudfront.net (CloudFront)&quot;,&#10;        &quot;X-Amz-Cf-Id&quot;: &quot;2XVrJVBNXsK4fimswJmFv1yz88CDC4FNX5NxDOG96fLI9P9xjKOW-w==&quot;,&#10;        &quot;X-Amzn-Trace-Id&quot;: &quot;Root=1-60b7b040-303a4c0d61eb63681d2a7751&quot;,&#10;        &quot;X-Forwarded-For&quot;: &quot;187.190.38.148, 130.176.55.95&quot;,&#10;        &quot;X-Forwarded-Port&quot;: &quot;443&quot;,&#10;        &quot;X-Forwarded-Proto&quot;: &quot;https&quot;&#10;    },&#10;    &quot;query&quot;: {},&#10;    &quot;path&quot;: {&#10;        &quot;user&quot;: &quot;drapaiton&quot;&#10;    },&#10;    &quot;identity&quot;: {&#10;        &quot;cognitoIdentityPoolId&quot;: &quot;&quot;,&#10;        &quot;accountId&quot;: &quot;&quot;,&#10;        &quot;cognitoIdentityId&quot;: &quot;&quot;,&#10;        &quot;caller&quot;: &quot;&quot;,&#10;        &quot;sourceIp&quot;: &quot;187.190.38.148&quot;,&#10;        &quot;principalOrgId&quot;: &quot;&quot;,&#10;        &quot;accessKey&quot;: &quot;&quot;,&#10;        &quot;cognitoAuthenticationType&quot;: &quot;&quot;,&#10;        &quot;cognitoAuthenticationProvider&quot;: &quot;&quot;,&#10;        &quot;userArn&quot;: &quot;&quot;,&#10;        &quot;userAgent&quot;: &quot;PostmanRuntime/7.26.8&quot;,&#10;        &quot;user&quot;: &quot;&quot;&#10;    },&#10;    &quot;stageVariables&quot;: {},&#10;    &quot;requestPath&quot;: &quot;/register/{user}&quot;&#10;}" />
+    <option name="inputIsFile" value="false" />
+    <sam>
+      <option name="additionalBuildArgs" value="" />
+      <option name="additionalLocalArgs" value="" />
+      <option name="buildInContainer" value="false" />
+      <option name="dockerNetwork" value="" />
+      <option name="skipImagePull" value="false" />
+    </sam>
+    <method v="2" />
+  </configuration>
+</component>
