@@ -17,27 +17,27 @@ provider:
 
 functions:
     websocket-connect:
-        handler: lambdas/websockets/connect.handler
+        handler: lambdas/web-socket.connect_handler
         events:
             - websocket:
                   route: $connect
     websocket-disconnect:
-        handler: lambdas/websockets/disconnect.handler
+        handler: lambdas/web-socket.disconnect_handler
         events:
             - websocket:
                   route: $disconnect
     websocket-default:
-        handler: lambdas/websockets/default.handler
+        handler: lambdas/web-socket.default_handler
         events:
             - websocket:
                   route: $default
     websocket-message:
-        handler: lambdas/websockets/message.handler
+        handler: lambdas/web-socket.writing_handler
         events:
             - websocket:
                   route: message
     endpoint-register-user:
-        handler: lambdas/endpoints/register_user.handler
+        handler: lambdas/new_resource.register_user_handler
         events: # The Events that trigger this Function
           - http:
               path: /register/{user}
@@ -51,7 +51,7 @@ functions:
                   paths:
                     user: true
     endpoint-send-message:
-        handler: lambdas/endpoints/send_message.handler
+        handler: lambdas/new_resource.send_message_handler
         events: # The Events that trigger this Function
           - http:
               path: /send
@@ -62,7 +62,7 @@ functions:
               request:
                 passThrough: WHEN_NO_MATCH
                 schemas:
-                  application/json: ${file(lambdas/endpoints/send_message_schema.json)}
+                  application/json: ${file(schemas/send_message_schema.json)}
 
 resources:
     # CloudFormation stack description
