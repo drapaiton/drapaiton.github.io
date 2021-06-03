@@ -1,11 +1,12 @@
-from src.common.config import CORS_ORIGIN, logger
+from common.config import CORS_ORIGIN, logger
+from dynamo.user import User
 
 
 def handler(event, context):
     logger.info(event)
     try:
         username = event["queryStringParameters"]["username"]
-        if log_in(username):
+        if User(username).is_registered:
             response = {
                 "principalId": "username",
                 "policyDocument": {
