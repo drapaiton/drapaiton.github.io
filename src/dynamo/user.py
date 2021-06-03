@@ -21,7 +21,7 @@ class User:
 
     def _register_user(self):
         failed_check = False
-        for process in (self._put_connection_list, self._put_registered):
+        for process in (self._put_connection_set, self._put_registered):
             try:
                 process()
             except ValueError as e:
@@ -36,19 +36,19 @@ class User:
         if not self.is_registered:
             self._register_user()
 
-    def add_connection(self, connection_id: str) -> dict:
+    def disconnect(self, connection_id: str) -> dict:
         try:
             response = TABLE.update_item(
                 Key={"username": self.username, "event": "CONNECTIONS"},
                 UpdateExpression="""\
-                SET content = list_append(content, :conn),
-                    metadata.updated = :updated""",
+                DELETE content :conn
+                SET metadata.updated = :updated""",
                 ReturnValues="UPDATED_NEW",
                 ExpressionAttributeValues={
-                    ":conn": [connection_id],
+                    ":conn": {connection_id},
                     ":updated": int(datetime.now().timestamp()),
                 },
-                ConditionExpression=~Attr("content").contains(connection_id),
+                ConditionExpression=Attr("content").contains(connection_id),
             )
         except ClientError as e:
             if (
@@ -56,11 +56,25 @@ class User:
                 == "ConditionalCheckFailedException"
             ):
                 logger.exception(e.response["Error"]["Message"])
-                raise ValueError("connection already exists")
+                raise ValueError("connection doesn't exists")
             else:
                 raise
         else:
             return response
+
+    def add_connection(self, connection_id: str) -> dict:
+        response = TABLE.update_item(
+            Key={"username": self.username, "event": "CONNECTIONS"},
+            UpdateExpression="""\
+            ADD content :conn
+            SET metadata.updated = :updated""",
+            ReturnValues="UPDATED_NEW",
+            ExpressionAttributeValues={
+                ":conn": {connection_id},
+                ":updated": int(datetime.now().timestamp()),
+            },
+        )
+        return response
 
     def send_message(self, message: str, message_type: str):
         message_type = message_type.upper()
@@ -86,13 +100,13 @@ class User:
             ReturnValues="NONE",
         )
 
-    def _put_connection_list(self):
+    def _put_connection_set(self):
         try:
             response = TABLE.put_item(
                 Item={
                     "username": self.username,
                     "event": "CONNECTIONS",
-                    "content": [],
+                    # "content": set([""]),
                     "metadata": {
                         "updated": int(datetime.now().timestamp()),
                         "registry_created": int(datetime.now().timestamp()),

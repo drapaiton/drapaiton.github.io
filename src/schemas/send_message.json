@@ -3,8 +3,8 @@
     "type": "object",
     "properties": {
         "username": {"type": "string", "pattern": "[a-zA-Z0-9]","minLength": 3, "maxLength": 50},
-        "message": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "content": {"type": "string", "minLength": 1, "maxLength": 1000},
         "message_type": {"type": "string", "maxLength": 50,"pattern": "[A-Z]"}
     },
-    "required": ["username", "message", "message_type"]
+    "required": ["username", "content", "message_type"]
 }
