@@ -1,5 +1,4 @@
-from .DynamoCrud import log_in
-from src.lambdas.common.config import CORS_ORIGIN, logger
+from src.common.config import CORS_ORIGIN, logger
 
 
 def handler(event, context):

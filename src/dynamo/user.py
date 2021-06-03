@@ -3,8 +3,7 @@ from . import TABLE
 from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 
-# from common.config import logger
-from lambdas.common.config import logger
+from src.common.config import logger
 
 
 class User:

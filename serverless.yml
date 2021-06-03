@@ -4,6 +4,12 @@ app: drapaiton-portfolio
 frameworkVersion: '2'
 service: pubsub-model
 
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.aws-sam/**'
+    - '!.serverless/**'
+
 custom:
   # This can be changed to the desired origin
   # When using lambda proxy integration, you have to manually add the CORS headers to responses...
