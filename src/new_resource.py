@@ -1,7 +1,7 @@
-from .common.WebSocketMessage import send
-from .common.responses import *
-from .dynamo.crud import get_all_online_users
-from .dynamo.user import User
+from common.WebSocketMessage import send
+from common.responses import *
+from dynamo.crud import get_all_online_users
+from dynamo.user import User
 
 
 def register_user_handler(ctx, *args, **kwargs):

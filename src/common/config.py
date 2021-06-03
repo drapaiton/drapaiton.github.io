@@ -6,11 +6,6 @@ AWS_REGION = environ["AWS_DEFAULT_REGION"] = "us-east-2"
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 TIME_FORMAT = "%H:%M:%S"
-logging.basicConfig(
-    format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
-    level=logging.DEBUG,
-    datefmt=TIME_FORMAT,
-)
 
 
 if PRODUCTION := bool(getenv("PRODUCTION", 0)):

@@ -22,7 +22,7 @@ provider:
   region: us-east-2
   memorySize: 128
   lambdaHashingVersion: 20201221
-  stage: dev
+  stage: prod
   timeout: 5
   logs:
     websocket:
