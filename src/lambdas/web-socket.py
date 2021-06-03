@@ -1,16 +1,20 @@
 # coding=utf-8
-from common.models import (
-    CreatedResourceResponse,
-    ExceptionResponse,
-)
+from datetime import datetime
+from json import dumps
 
-USERNAME = "drapaiton"
+from common.responses import (
+    CreatedResource,
+    AException,
+)
+from dynamo.user import User
 
 
 def connect_handler(event: dict, ctx):
-    response = CreatedResourceResponse(message="connected", created={}).dict()
-    return response
-    # return {"statusCode": 200, "body": "connected!", "headers": ""}
+
+    User()
+    return {
+        "statusCode": 200,
+    }
 
 
 def default_handler(event: dict, ctx):

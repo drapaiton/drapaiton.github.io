@@ -1,37 +1,29 @@
 from datetime import datetime
-from json import dumps
 from typing import Union
 
 from pydantic import BaseModel
 
 
-class ApiResponse(BaseModel):
+class BaseResponse(BaseModel):
     headers: dict = {
         "Content-Type": "application/json",
         "Access-Control-Allow-Methods": "*",
         "Access-Control-Allow-Origin": "*",
     }
     date = str(datetime.now())
-    statusCode: int
-    body: str
+    statusCode: int = 500
+    body: dict
 
 
-class CreatedResourceResponse(ApiResponse):
+class CreatedResource(BaseResponse):
     statusCode = 200
-    headers: str = dumps(
-        {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Methods": "*",
-            "Access-Control-Allow-Origin": "*",
-        }
-    )
 
     def __init__(self, created: dict, message: str):
-        _body = dumps({"created": created, "message": str(message)})
+        _body = {"created": created, "message": str(message)}
         super().__init__(body=_body)
 
 
-class ExceptionResponse(ApiResponse):
+class AException(BaseResponse):
     statusCode = 500
 
     def __init__(self, error: Union[str, Exception]):
@@ -39,7 +31,7 @@ class ExceptionResponse(ApiResponse):
 
 
 # noinspection SpellCheckingInspection
-class UnprocessableEntityResponse(ApiResponse):
+class UnprocessableEntity(BaseResponse):
     statusCode = 422
 
     def __init__(self, body: dict):

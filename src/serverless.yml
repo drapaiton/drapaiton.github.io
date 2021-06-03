@@ -4,6 +4,12 @@ app: drapaiton-portfolio
 frameworkVersion: '2'
 service: pubsub-model
 
+custom:
+  # This can be changed to the desired origin
+  # When using lambda proxy integration, you have to manually add the CORS headers to responses...
+  # https://github.com/serverless/serverless/issues/4681
+  CORS_ORIGIN: '*'
+
 provider:
   name: aws
   runtime: python3.8
@@ -17,6 +23,7 @@ provider:
       level: INFO
   websocketsApiRouteSelectionExpression: $request.body.action
   environment:
+    CORS_ORIGIN: ${self:custom:CORS_ORIGIN}
     APIG_ENDPOINT:
       Fn::Join:
         - ''
@@ -46,8 +53,8 @@ provider:
             - "arn:aws:execute-api:*:*:**/@connections/*"
 
 functions:
-    authWebsocket:
-      handler: lambdas/common/myauth.handler
+    auth:
+      handler: lambdas/common/auth.handler
       events:
         - http:
             path: /auth
@@ -63,7 +70,7 @@ functions:
                   authorizer:
                     name: authWebsocket
                     identitySource:
-                      - "route.request.querystring.Auth"
+                      - "route.request.querystring.username"
     websocket-disconnect:
         handler: lambdas/web-socket.disconnect_handler
         events:
@@ -88,10 +95,6 @@ functions:
               method: post
               cors: false
               private: false # Requires clients to add API keys values in the `x-api-key` header of their request
-              authorizer:
-                name: authWebsocket
-                identitySource:
-                  - "method.request.header.Auth"
               request:
                 passThrough: WHEN_NO_MATCH
                 parameters:
