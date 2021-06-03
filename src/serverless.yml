@@ -3,8 +3,6 @@ app: drapaiton-portfolio
 
 frameworkVersion: '2'
 service: pubsub-model
-plugins:
-  - serverless-python-requirements
 
 provider:
   name: aws
@@ -15,61 +13,74 @@ provider:
   stage: dev
   timeout: 5
   logs:
-    websocket: true
+    websocket:
+      level: INFO
   websocketsApiRouteSelectionExpression: $request.body.action
   environment:
-    CORS_ORIGIN: ${self:custom.corsOrigin}
+    APIG_ENDPOINT:
+      Fn::Join:
+        - ''
+        - - Ref: WebsocketsApi
+          - .execute-api.
+          - Ref: AWS::Region
+          - .amazonaws.com/
+          - ${self:provider.stage}
     DYNAMODB_SOCKETS_TYPE_GSI: ${self:service}-sockets-type-gsi-${opt:stage, self:provider.stage}
     DYNAMODB_SOCKETS_TABLE: ${self:service}-sockets-${opt:stage, self:provider.stage}
-  iamRoleStatements:
-    # Websocket permissions
-    - Effect: Allow
-      Action:
-        - "execute-api:ManageConnections"
-      Resource:
-        - "arn:aws:execute-api:${opt:region, self:provider.region}:*:**/@connections/*"
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource:
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_SOCKETS_TABLE}"
-        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_SOCKETS_TABLE}/index/${self:provider.environment.DYNAMODB_SOCKETS_TYPE_GSI}"
 
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - "dynamodb:PutItem"
+            - "dynamodb:GetItem"
+            - "dynamodb:DeleteItem"
+            - "dynamodb:Scan"
+          Resource:
+            - Fn::GetAtt: [WeboscketUserTable, Arn]
+        - Effect: Allow
+          Action:
+            - "execute-api:ManageConnections"
+          Resource:
+            - "arn:aws:execute-api:*:*:**/@connections/*"
 
 functions:
     authWebsocket:
-      handler: src/lambdas/common/myauth.handler
+      handler: lambdas/common/myauth.handler
+      events:
+        - http:
+            path: /auth
+            integration: lambda
+            method: post
+            cors: false
+            private: false # Requires clients to add API keys values in the `x-api-key` header of their request
     websocket-connect:
-        handler: src/lambdas/web-socket.connect_handler
+        handler: lambdas/web-socket.connect_handler
         events:
             - websocket:
                   route: $connect
                   authorizer:
                     name: authWebsocket
                     identitySource:
-                      - 'route.request.querystring.Authorizer'
+                      - "route.request.querystring.Auth"
     websocket-disconnect:
-        handler: src/lambdas/web-socket.disconnect_handler
+        handler: lambdas/web-socket.disconnect_handler
         events:
             - websocket:
                   route: $disconnect
     websocket-default:
-        handler: src/lambdas/web-socket.default_handler
+        handler: lambdas/web-socket.default_handler
         events:
             - websocket:
                   route: $default
     websocket-message:
-        handler: src/lambdas/web-socket.writing_handler
+        handler: lambdas/web-socket.writing_handler
         events:
             - websocket:
                   route: message
     endpoint-register-user:
-        handler: src/lambdas/new_resource.register_user_handler
+        handler: lambdas/new_resource.register_user_handler
         events: # The Events that trigger this Function
           - http:
               path: /register/{user}
@@ -77,13 +88,17 @@ functions:
               method: post
               cors: false
               private: false # Requires clients to add API keys values in the `x-api-key` header of their request
+              authorizer:
+                name: authWebsocket
+                identitySource:
+                  - "method.request.header.Auth"
               request:
                 passThrough: WHEN_NO_MATCH
                 parameters:
                   paths:
                     user: true
     endpoint-send-message:
-        handler: src/lambdas/new_resource.send_message_handler
+        handler: lambdas/new_resource.send_message_handler
         events: # The Events that trigger this Function
           - http:
               path: /send
@@ -117,3 +132,6 @@ resources:
                     - AttributeName: event
                       AttributeType: S
                 BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-python-requirements

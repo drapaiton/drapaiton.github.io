@@ -1,32 +1,27 @@
 # coding=utf-8
-from common.DynamoCrud import update_user
-from common.config import logger
 from common.models import (
     CreatedResourceResponse,
     ExceptionResponse,
 )
 
+USERNAME = "drapaiton"
+
 
 def connect_handler(event: dict, ctx):
-    logger.info(str(ctx) + str(event))
-    USERNAME = "drapaiton"
-    response = update_user(username=USERNAME, connected=True)
-
-    return CreatedResourceResponse(message="connected", created=response)
+    response = CreatedResourceResponse(message="connected", created={}).dict()
+    return response
+    # return {"statusCode": 200, "body": "connected!", "headers": ""}
 
 
 def default_handler(event: dict, ctx):
-    logger.info(str(ctx) + str(event))
-    return ExceptionResponse(error="UNKNOWN ERROR 500")
+    print(event)
+    return ExceptionResponse(error="UNKNOWN ERROR 500").dict()
 
 
 def disconnect_handler(event: dict, ctx):
-    logger.info(str(ctx) + str(event))
-    USERNAME = "drapaiton"
-    response = update_user(username=USERNAME, connected=False)
-    return CreatedResourceResponse(created=response, message="disconnected")
+    print(event)
+    return CreatedResourceResponse(created={}, message="disconnected").dict()
 
 
 def writing_handler(event: dict, ctx):
-    logger.info(str(ctx) + str(event))
     raise NotImplementedError()

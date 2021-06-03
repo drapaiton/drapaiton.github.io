@@ -2,9 +2,12 @@
 from typing import List
 
 import boto3
-from os import environ
+from os import environ, getenv
 
+endpoint_url = getenv("APIG_ENDPOINT")
 REGION = environ["AWS_REGION"] or environ.get("AWS_DEFAULT_REGION")
+
+print(endpoint_url)
 
 
 def _create(domain_name: str, stage: str):

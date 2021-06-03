@@ -29,7 +29,7 @@ def register_user(username: str) -> Tuple[dict, dict]:
         response = TABLE.put_item(
             Item=_item,
             ConditionExpression=Attr("username").not_exists(),
-            ReturnValues="ALL_NEW",
+            ReturnValues="NONE",
         )
     except ClientError as e:
         if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
@@ -41,29 +41,17 @@ def register_user(username: str) -> Tuple[dict, dict]:
         return response, _item
 
 
-def update_user(username: str, connected: bool):
-    try:
-        response = TABLE.update_item(
-            Key={
-                "username": username,
-                "event": "connection",
-            },
-            UpdateExpression="""
-            set info.is_connected=:is_connected,
-            info.connected_since=:connected_since""",
-            ExpressionAttributeValues={
-                ":is_connected": connected,
-                ":connected_since": datetime.now().timestamp(),
-            },
-            ReturnValues="UPDATED_NEW",
-        )
-    except ClientError as e:
-        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
-            logger.exception(e.response["Error"]["Message"])
-        else:
-            raise
-    else:
-        return response
+def add_connection(username: str, connection_id: str):
+    response = TABLE.update_item(
+        Key={"username": username, "event": "connections"},
+        UpdateExpression="SET info.content = "
+        f"list_append(info.content, :id)",
+        ReturnValues="UPDATED_NEW",
+        ExpressionAttributeValues={
+            ":id": [connection_id],
+        },
+    )
+    return response
 
 
 def send_message(
@@ -81,6 +69,6 @@ def send_message(
 
     response = TABLE.put_item(
         Item=_item,
-        ReturnValues="ALL_OLD",
+        ReturnValues="NONE",
     )
     return response, _item
