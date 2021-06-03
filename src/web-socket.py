@@ -1,31 +1,27 @@
 # coding=utf-8
-from datetime import datetime
-from json import dumps
 
-from common.responses import (
-    CreatedResource,
-    AException,
-)
+from common.config import logger
+from common.responses import AException, CreatedResource
 from dynamo.user import User
 
 
-def connect_handler(event: dict, ctx):
-
-    User()
-    return {
-        "statusCode": 200,
-    }
-
-
-def default_handler(event: dict, ctx):
-    print(event)
-    return ExceptionResponse(error="UNKNOWN ERROR 500").dict()
+def connect_handler(event: dict, *args, **kwargs):
+    logger.info(event)
+    username = event["queryStringParameters"]["username"]
+    User(username=username)
+    return {"statusCode": 200}
 
 
-def disconnect_handler(event: dict, ctx):
-    print(event)
-    return CreatedResourceResponse(created={}, message="disconnected").dict()
-
-
-def writing_handler(event: dict, ctx):
+def writing_handler(event: dict, *args, **kwargs):
     raise NotImplementedError()
+
+
+def default_handler(event: dict, *args, **kwargs):
+    logger.info(event)
+    return AException(error="UNKNOWN ERROR 500").dict()
+
+
+def disconnect_handler(event: dict, *args, **kwargs):
+    logger.info(event)
+
+    return CreatedResource(created={}, message="disconnected").dict()

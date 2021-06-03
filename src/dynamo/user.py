@@ -1,9 +1,10 @@
 from datetime import datetime
-from . import TABLE
+
 from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 
-from src.common.config import logger
+from . import TABLE
+from ..common.config import logger
 
 
 class User:
@@ -16,19 +17,9 @@ class User:
         logger.info(f"{exists=}")
         return exists
 
-    def __init__(self, username: str):
-        self.username = username
-
-        if not self.is_registered:
-            self._register_user()
-
     def _register_user(self):
         failed_check = False
-        for process in (
-            self._create_messages_entry,
-            self._create_connections_entry,
-            self._create_registered,
-        ):
+        for process in (self._put_connection_list, self._put_registered):
             try:
                 process()
             except ValueError as e:
@@ -37,76 +28,11 @@ class User:
         if failed_check:
             raise ValueError(e)
 
-    def _create_registered(self):
-        try:
-            response = TABLE.put_item(
-                Item={
-                    "username": self.username,
-                    "event": "REGISTERED",
-                    "info.updated": int(datetime.now().timestamp()),
-                },
-                ConditionExpression=Attr("username").not_exists(),
-                ReturnValues="NONE",
-            )
-        except ClientError as e:
-            if (
-                e.response["Error"]["Code"]
-                == "ConditionalCheckFailedException"
-            ):
-                logger.exception(e.response["Error"]["Message"])
-                raise ValueError("user already exists")
-            else:
-                raise
-        else:
-            return response
+    def __init__(self, username: str):
+        self.username = username
 
-    def _create_connections_entry(self):
-        try:
-            response = TABLE.put_item(
-                Item={
-                    "username": self.username,
-                    "event": "CONNECTIONS",
-                    "content": [],
-                    "info.updated": int(datetime.now().timestamp()),
-                },
-                ConditionExpression=Attr("event").not_exists(),
-                ReturnValues="NONE",
-            )
-        except ClientError as e:
-            if (
-                e.response["Error"]["Code"]
-                == "ConditionalCheckFailedException"
-            ):
-                logger.exception(e.response["Error"]["Message"])
-                raise ValueError("user already exists")
-            else:
-                raise
-        else:
-            return response
-
-    def _create_messages_entry(self):
-        try:
-            response = TABLE.put_item(
-                Item={
-                    "username": self.username,
-                    "event": "MESSAGES",
-                    "content": [],
-                    "info.updated": int(datetime.now().timestamp()),
-                },
-                ConditionExpression=Attr("event").not_exists(),
-                ReturnValues="NONE",
-            )
-        except ClientError as e:
-            if (
-                e.response["Error"]["Code"]
-                == "ConditionalCheckFailedException"
-            ):
-                logger.exception(e.response["Error"]["Message"])
-                raise ValueError("user already exists")
-            else:
-                raise
-        else:
-            return response
+        if not self.is_registered:
+            self._register_user()
 
     def add_connection(self, connection_id: str) -> dict:
         try:
@@ -148,3 +74,56 @@ class User:
             },
             ReturnValues="NONE",
         )
+
+    def _put_connection_list(self):
+        try:
+            response = TABLE.put_item(
+                Item={
+                    "username": self.username,
+                    "event": "CONNECTIONS",
+                    "content": [],
+                    "info.updated": int(datetime.now().timestamp()),
+                },
+                ConditionExpression=Attr("event").not_exists(),
+                ReturnValues="NONE",
+            )
+        except ClientError as e:
+            if (
+                e.response["Error"]["Code"]
+                == "ConditionalCheckFailedException"
+            ):
+                logger.exception(e.response["Error"]["Message"])
+                raise ValueError("user already exists")
+            else:
+                raise
+        else:
+            return response
+
+    def _put_registered(self):
+        try:
+            response = TABLE.put_item(
+                Item={
+                    "username": self.username,
+                    "event": "REGISTERED",
+                    "info.updated": int(datetime.now().timestamp()),
+                },
+                ConditionExpression=Attr("username").not_exists(),
+                ReturnValues="NONE",
+            )
+        except ClientError as e:
+            if (
+                e.response["Error"]["Code"]
+                == "ConditionalCheckFailedException"
+            ):
+                logger.exception(e.response["Error"]["Message"])
+                raise ValueError("user already exists")
+            else:
+                raise
+        else:
+            return response
+
+    def __str__(self):
+        return str(self.username)
+
+    def __dict__(self):
+        return {"username": self.username}

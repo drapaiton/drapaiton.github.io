@@ -2,7 +2,7 @@ from common.config import CORS_ORIGIN, logger
 from dynamo.user import User
 
 
-def handler(event, context):
+def handler(event, *args, **kwargs):
     logger.info(event)
     try:
         username = event["queryStringParameters"]["username"]

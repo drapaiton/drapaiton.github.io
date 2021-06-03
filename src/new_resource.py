@@ -1,22 +1,18 @@
-from common.DynamoCrud import register_user, send_message
-from common.models import (
-    CreatedResourceResponse,
-    ExceptionResponse,
-    UnprocessableEntityResponse,
-)
+from .dynamo.user import User
+from .common.responses import *
 
 
 def register_user_handler(ctx, *args, **kwargs):
     new_user: str = ctx["path"]["user"]
     try:
-        _, item = register_user(username=new_user)
+        user = User(username=new_user)
     except ValueError as e:
-        return UnprocessableEntityResponse({"error": e}).dict()
+        return UnprocessableEntity({"error": e}).dict()
     except Exception as e:
-        return ExceptionResponse(e).dict()
+        return AException(e).dict()
     else:
         MSG = "you successfully registered a user!"
-        return CreatedResourceResponse(message=MSG, created=item).dict()
+        return CreatedResource(message=MSG, created=user.__dict__()).dict()
 
 
 MESSAGE_TYPES = (
@@ -25,20 +21,20 @@ MESSAGE_TYPES = (
 )
 
 
-def send_message_handler(ctx, event):
-    username = ctx["username"]
+def send_message_handler(ctx, *args, **kwargs):
+    user = User(username=ctx["username"])
     message = ctx["message"]
+    message_type = ctx["message_type"]
 
-    if message_type := ctx["message_type"] not in MESSAGE_TYPES:
+    if message_type not in MESSAGE_TYPES:
         ERROR = f"unexpected value [{message_type=}]"
         OUTPUT = {"error": ERROR, "expected_values": str(MESSAGE_TYPES)}
-        return UnprocessableEntityResponse(body=OUTPUT).dict()
+        return UnprocessableEntity(body=OUTPUT).dict()
+
     try:
-        _, item = send_message(
-            username=username, message=message, message_type=message_type
-        )
+        created = user.send_message(message=message, message_type=message_type)
     except Exception as e:
-        return ExceptionResponse(e).dict()
+        return AException(e).dict()
     else:
         MSG = "you successfully send a message!"
-        return CreatedResourceResponse(message=MSG, created=item).dict()
+        return CreatedResource(message=MSG, created=created).dict()

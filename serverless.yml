@@ -29,7 +29,7 @@ provider:
       level: INFO
   websocketsApiRouteSelectionExpression: $request.body.action
   environment:
-    CORS_ORIGIN: ${self:custom:CORS_ORIGIN}
+    CORS_ORIGIN: ${self:custom.CORS_ORIGIN}
     APIG_ENDPOINT:
       Fn::Join:
         - ''
