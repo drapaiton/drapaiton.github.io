@@ -1,13 +1,15 @@
 from datetime import datetime
-
+from uuid import uuid4
 from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 
-from . import TABLE
-from ..common.config import logger
+from .config import TABLE
+from common.config import logger
 
 
 class User:
+    MESSAGE_TYPES = ("MESSAGE", "PLAY_VIDEO")
+
     @property
     def is_registered(self):
         response = TABLE.get_item(
@@ -39,17 +41,14 @@ class User:
             response = TABLE.update_item(
                 Key={"username": self.username, "event": "CONNECTIONS"},
                 UpdateExpression="""\
-                SET connections = list_append(connections,":new_conn)\
-                SET info.updated = :updated""",
+                SET content = list_append(content, :conn),
+                    metadata.updated = :updated""",
                 ReturnValues="UPDATED_NEW",
-                # TODO check (info.updated) update
                 ExpressionAttributeValues={
-                    ":new_conn": [connection_id],
+                    ":conn": [connection_id],
                     ":updated": int(datetime.now().timestamp()),
                 },
-                ConditionExpression=~Attr("connections").contains(
-                    connection_id
-                ),
+                ConditionExpression=~Attr("content").contains(connection_id),
             )
         except ClientError as e:
             if (
@@ -64,13 +63,25 @@ class User:
             return response
 
     def send_message(self, message: str, message_type: str):
+        message_type = message_type.upper()
+
+        if message_type not in self.MESSAGE_TYPES:
+            ERROR = f"unexpected value [{message_type=}]"
+            OUTPUT = {
+                "error": ERROR,
+                "expected_values": str(self.MESSAGE_TYPES),
+            }
+            raise ValueError(OUTPUT)
+
         return TABLE.put_item(
             Item={
                 "username": self.username,
-                "event": "MESSAGES",
+                "event": f"{message_type} {uuid4()}",
                 "content": message,
-                "info.message_type": message_type,
-                "info.updated": int(datetime.now().timestamp()),
+                "metadata": {
+                    "updated": int(datetime.now().timestamp()),
+                    "registry_created": int(datetime.now().timestamp()),
+                },
             },
             ReturnValues="NONE",
         )
@@ -82,7 +93,10 @@ class User:
                     "username": self.username,
                     "event": "CONNECTIONS",
                     "content": [],
-                    "info.updated": int(datetime.now().timestamp()),
+                    "metadata": {
+                        "updated": int(datetime.now().timestamp()),
+                        "registry_created": int(datetime.now().timestamp()),
+                    },
                 },
                 ConditionExpression=Attr("event").not_exists(),
                 ReturnValues="NONE",
@@ -105,7 +119,10 @@ class User:
                 Item={
                     "username": self.username,
                     "event": "REGISTERED",
-                    "info.updated": int(datetime.now().timestamp()),
+                    "metadata": {
+                        "updated": int(datetime.now().timestamp()),
+                        "registry_created": int(datetime.now().timestamp()),
+                    },
                 },
                 ConditionExpression=Attr("username").not_exists(),
                 ReturnValues="NONE",

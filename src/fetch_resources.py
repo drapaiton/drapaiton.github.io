@@ -7,4 +7,4 @@ def handler(ctx, *args, **kwargs):
 
 
 def get_connected_users(ctx, *args, **kwargs):
-    crud
+    ...

@@ -18,8 +18,8 @@ class BaseResponse(BaseModel):
 class CreatedResource(BaseResponse):
     statusCode = 200
 
-    def __init__(self, created: dict, message: str):
-        _body = {"created": created, "message": str(message)}
+    def __init__(self, created: Union[dict, object], message: str):
+        _body = {"created": dict(created), "message": str(message)}
         super().__init__(body=_body)
 
 

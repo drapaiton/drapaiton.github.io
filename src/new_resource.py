@@ -12,13 +12,7 @@ def register_user_handler(ctx, *args, **kwargs):
         return AException(e).dict()
     else:
         MSG = "you successfully registered a user!"
-        return CreatedResource(message=MSG, created=user.__dict__()).dict()
-
-
-MESSAGE_TYPES = (
-    "MESSAGE",
-    "PLAY_VIDEO",
-)
+        return CreatedResource(message=MSG, created=user).dict()
 
 
 def send_message_handler(ctx, *args, **kwargs):
@@ -26,13 +20,10 @@ def send_message_handler(ctx, *args, **kwargs):
     message = ctx["message"]
     message_type = ctx["message_type"]
 
-    if message_type not in MESSAGE_TYPES:
-        ERROR = f"unexpected value [{message_type=}]"
-        OUTPUT = {"error": ERROR, "expected_values": str(MESSAGE_TYPES)}
-        return UnprocessableEntity(body=OUTPUT).dict()
-
     try:
         created = user.send_message(message=message, message_type=message_type)
+    except ValueError as e:
+        return UnprocessableEntity(body=sum([], e.args)[0]).dict()
     except Exception as e:
         return AException(e).dict()
     else:

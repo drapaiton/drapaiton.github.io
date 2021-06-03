@@ -2,7 +2,7 @@ from typing import Callable
 
 from boto3.dynamodb.conditions import Key
 
-from . import TABLE
+from .config import TABLE
 
 
 def _paginate_all(query: Callable):

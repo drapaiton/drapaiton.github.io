@@ -1,1 +1,1 @@
-from . import common
+from common.config import *

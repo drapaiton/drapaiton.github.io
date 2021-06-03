@@ -1,5 +1,5 @@
-from common.config import CORS_ORIGIN, logger
 from dynamo.user import User
+from common.config import CORS_ORIGIN, logger
 
 
 def handler(event, *args, **kwargs):
