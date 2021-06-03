@@ -1,14 +1,14 @@
 from .common.WebSocketMessage import send
+from .common.responses import *
 from .dynamo.crud import get_all_online_users
 from .dynamo.user import User
-from .common.responses import *
-from .common.WebSocketMessage import send
 
 
 def register_user_handler(ctx, *args, **kwargs):
     new_user: str = ctx["path"]["user"]
     try:
         user = User(username=new_user)
+        user.register_user()
     except ValueError as e:
         return UnprocessableEntity({"error": e}).dict()
     except Exception as e:
@@ -31,7 +31,7 @@ def send_message_handler(ctx, *args, **kwargs):
                 "content": content,
                 "message_type": message_type,
             },
-            get_all_online_users(),
+            (i["content"] for i in get_all_online_users()),
         )
     except ValueError as e:
         return UnprocessableEntity(body=sum([], e.args)[0]).dict()

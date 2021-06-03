@@ -16,10 +16,9 @@ class User:
             Key={"username": self.username, "event": "REGISTERED"}
         )
         exists = bool(response.get("Item"))
-        logger.info(f"{exists=}")
         return exists
 
-    def _register_user(self):
+    def register_user(self):
         failed_check = False
         for process in (self._put_connection_set, self._put_registered):
             try:
@@ -32,9 +31,6 @@ class User:
 
     def __init__(self, username: str):
         self.username = username
-
-        if not self.is_registered:
-            self._register_user()
 
     def disconnect(self, connection_id: str) -> dict:
         try:

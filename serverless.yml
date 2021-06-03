@@ -51,7 +51,7 @@ provider:
             - "dynamodb:DeleteItem"
             - "dynamodb:Scan"
           Resource:
-            - Fn::GetAtt: [WeboscketUserTable, Arn]
+            - Fn::GetAtt: [WebsocketUsersTable, Arn]
         - Effect: Allow
           Action:
             - "execute-api:ManageConnections"
@@ -60,7 +60,7 @@ provider:
 
 functions:
     auth:
-      handler: lambdas/common/auth.handler
+      handler: src/auth.handler
       events:
         - http:
             path: /auth
@@ -69,31 +69,31 @@ functions:
             cors: false
             private: false # Requires clients to add API keys values in the `x-api-key` header of their request
     websocket-connect:
-        handler: lambdas/web-socket.connect_handler
+        handler: src/web-socket.connect_handler
         events:
             - websocket:
                   route: $connect
                   authorizer:
-                    name: authWebsocket
+                    name: auth
                     identitySource:
                       - "route.request.querystring.username"
     websocket-disconnect:
-        handler: lambdas/web-socket.disconnect_handler
+        handler: src/web-socket.disconnect_handler
         events:
             - websocket:
                   route: $disconnect
     websocket-default:
-        handler: lambdas/web-socket.default_handler
+        handler: src/web-socket.default_handler
         events:
             - websocket:
                   route: $default
     websocket-message:
-        handler: lambdas/web-socket.writing_handler
+        handler: src/web-socket.writing_handler
         events:
             - websocket:
                   route: message
     endpoint-register-user:
-        handler: lambdas/new_resource.register_user_handler
+        handler: src/new_resource.register_user_handler
         events: # The Events that trigger this Function
           - http:
               path: /register/{user}
@@ -107,7 +107,7 @@ functions:
                   paths:
                     user: true
     endpoint-send-message:
-        handler: lambdas/new_resource.send_message_handler
+        handler: src/new_resource.send_message_handler
         events: # The Events that trigger this Function
           - http:
               path: /send
@@ -126,7 +126,7 @@ resources:
       PUB-SUB model implementation
       for a simple chat webapp application
     Resources:
-        WeboscketUserTable:
+        WebsocketUsersTable:
             Type: AWS::DynamoDB::Table
             Properties:
                 TableName: WebSocketUsers

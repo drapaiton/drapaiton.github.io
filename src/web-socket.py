@@ -12,7 +12,7 @@ def connect_handler(event: dict, *args, **kwargs):
     try:
         User(username=username).add_connection(connection_id)
     except ValueError as e:
-        ...
+        logger.exception(e)
     return {"statusCode": 200}
 
 

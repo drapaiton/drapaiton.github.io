@@ -2,7 +2,6 @@ import logging
 from os import environ, getenv
 
 AWS_REGION = environ["AWS_DEFAULT_REGION"] = "us-east-2"
-environ["AWS_PROFILE"] = "serverlessUser"
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
