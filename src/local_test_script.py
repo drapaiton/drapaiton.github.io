@@ -2,14 +2,17 @@ import logging
 from os import environ
 
 environ["AWS_PROFILE"] = "serverlessUser"
-from common.config import TIME_FORMAT
-from dynamo.user import User
-
+from src.common.config import TIME_FORMAT
+from src.dynamo.user import User
+from src.dynamo.crud import *
+from dateutil.relativedelta import relativedelta
 
 if __name__ == "__main__":
     logging.basicConfig(
-        format="%(asctime)s %(levelname)s:%(name)s: %(message)s",
         level=logging.DEBUG,
         datefmt=TIME_FORMAT,
     )
     user = User("drapaiton")
+
+    now = datetime.now()
+    week_ago = now - relativedelta(days=7)

@@ -3,7 +3,7 @@ from typing import Callable
 
 from boto3.dynamodb.conditions import Attr, Key
 
-from .config import TABLE
+from src.common.config import DYNAMO_TABLE as TABLE
 
 
 def _paginate_all(query: Callable):
@@ -60,10 +60,12 @@ def get_all_online_users(**kwargs) -> list:
         Select="ALL_ATTRIBUTES",
         FilterExpression=Key("event")
         .eq("CONNECTIONS")
-        .__and__(Attr("content").exists())
-        ** kwargs,
+        .__and__(Attr("content").exists()),
+        **kwargs,
     )
-    return response["Items"]
+    for item in response["Items"]:
+        for _id in item["content"]:
+            yield _id
 
 
 def get_connections(username, **kwargs) -> list:
@@ -75,4 +77,6 @@ def get_connections(username, **kwargs) -> list:
         .__and__(Attr("content").exists()),
         **kwargs,
     )
-    return response["Items"]
+    for item in response["Items"]:
+        for _id in item["content"]:
+            yield _id

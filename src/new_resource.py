@@ -1,11 +1,16 @@
-from common.WebSocketMessage import send
-from common.responses import *
-from dynamo.crud import get_all_online_users
-from dynamo.user import User
+from src.common.WebSocketMessage import send
+from src.common.responses import (
+    AException,
+    CreatedResource,
+    UnprocessableEntity,
+)
+from src.dynamo.crud import get_all_online_users
+from src.dynamo.user import User
 
 
-def register_user_handler(ctx, *args, **kwargs):
-    new_user: str = ctx["path"]["user"]
+def register_user_handler(event, _):
+    print(event)
+    new_user: str = event["path"]["user"]
     try:
         user = User(username=new_user)
         user.register_user()
@@ -18,21 +23,22 @@ def register_user_handler(ctx, *args, **kwargs):
         return CreatedResource(message=MSG, created=user).dict()
 
 
-def send_message_handler(ctx, *args, **kwargs):
-    user = User(username=ctx["username"])
-    content = ctx["content"]
-    message_type = ctx["message_type"]
+def send_message_handler(event, _):
+    print(event)
+    body = event["body"]
 
+    user = User(username=body["username"])
+    content = body["content"]
+    message_type = body["message_type"]
     try:
         created = user.send_message(message=content, message_type=message_type)
-        send(
-            {
-                "username": user.username,
-                "content": content,
-                "message_type": message_type,
-            },
-            (i["content"] for i in get_all_online_users()),
-        )
+        PAYLOAD = {
+            "username": user.username,
+            "content": content,
+            "message_type": message_type,
+        }
+        print(PAYLOAD)
+        send(PAYLOAD, list(get_all_online_users()))
     except ValueError as e:
         return UnprocessableEntity(body=sum([], e.args)[0]).dict()
     except Exception as e:

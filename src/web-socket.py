@@ -1,12 +1,12 @@
 # coding=utf-8
 
-from common.config import logger
-from common.responses import AException, CreatedResource
-from dynamo.user import User
+from src.common.config import logger
+from src.common.responses import AException, CreatedResource
+from src.dynamo.user import User
 
 
-def connect_handler(event: dict, *args, **kwargs):
-    logger.info(event)
+def connect_handler(event: dict, _):
+    print(event)
     connection_id = event["requestContext"]["connectionId"]
     username = event["queryStringParameters"]["username"]
     try:
@@ -16,21 +16,21 @@ def connect_handler(event: dict, *args, **kwargs):
     return {"statusCode": 200}
 
 
-def writing_handler(event: dict, *args, **kwargs):
-    logger.info(event)
+def writing_handler(event: dict, _):
+    print(event)
     connection_id = event["requestContext"]["connectionId"]
     username = event["queryStringParameters"]["username"]
     User(username=username)
     raise NotImplementedError()
 
 
-def default_handler(event: dict, *args, **kwargs):
-    logger.info(event)
+def default_handler(event: dict, _):
+    print(event)
     return AException(error="UNKNOWN ERROR 500").dict()
 
 
-def disconnect_handler(event: dict, *args, **kwargs):
-    logger.info(event)
+def disconnect_handler(event: dict, _):
+    print(event)
     connection_id = event["requestContext"]["connectionId"]
     username = event["queryStringParameters"]["username"]
     try:

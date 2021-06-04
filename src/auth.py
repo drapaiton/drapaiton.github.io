@@ -1,9 +1,8 @@
-from dynamo.user import User
-from common.config import CORS_ORIGIN, logger
+from src.common.config import CORS_ORIGIN
+from src.dynamo.user import User
 
 
-def handler(event, *args, **kwargs):
-    logger.info(event)
+def generate_policy(event):
     try:
         username = event["queryStringParameters"]["username"]
         if User(username).is_registered:
@@ -20,21 +19,23 @@ def handler(event, *args, **kwargs):
                     ],
                 },
             }
-            logger.info(response)
             return response
         else:
             response = {
-                "statusCode": 403,
-                "headers": {
-                    "Content-Type": "text/plain",
-                    "Access-Control-Allow-Origin": CORS_ORIGIN,
+                "principalId": "username",
+                "policyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": "execute-api:Invoke",
+                            "Effect": "Deny",
+                            "Resource": "*",
+                        }
+                    ],
                 },
-                "body": "credentials has no access",
             }
-            logger.info(response)
             return response
     except Exception as e:
-        logger.exception(str(e))
         return {
             "statusCode": 500,
             "headers": {
@@ -43,3 +44,10 @@ def handler(event, *args, **kwargs):
             },
             "body": str(e),
         }
+
+
+def handler(event, _):
+    print(event)
+    output = generate_policy(event)
+    print(output)
+    return output

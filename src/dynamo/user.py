@@ -1,10 +1,12 @@
 from datetime import datetime
 from uuid import uuid4
-from boto3.dynamodb.conditions import Attr
-from botocore.exceptions import ClientError
 
-from .config import TABLE
-from common.config import logger
+from boto3.dynamodb.conditions import Attr
+
+from src.common.config import (
+    ConditionalCheckFailedException,
+    DYNAMO_TABLE,
+)
 
 
 class User:
@@ -12,29 +14,28 @@ class User:
 
     @property
     def is_registered(self):
-        response = TABLE.get_item(
+        response = DYNAMO_TABLE.get_item(
             Key={"username": self.username, "event": "REGISTERED"}
         )
         exists = bool(response.get("Item"))
         return exists
 
     def register_user(self):
-        failed_check = False
+        exception = False
         for process in (self._put_connection_set, self._put_registered):
             try:
                 process()
-            except ValueError as e:
-                failed_check = True
-
-        if failed_check:
-            raise ValueError(e)
+            except ValueError as exception:
+                continue
+        if exception:
+            raise ValueError(exception)
 
     def __init__(self, username: str):
         self.username = username
 
     def disconnect(self, connection_id: str) -> dict:
         try:
-            response = TABLE.update_item(
+            response = DYNAMO_TABLE.update_item(
                 Key={"username": self.username, "event": "CONNECTIONS"},
                 UpdateExpression="""\
                 DELETE content :conn
@@ -46,20 +47,13 @@ class User:
                 },
                 ConditionExpression=Attr("content").contains(connection_id),
             )
-        except ClientError as e:
-            if (
-                e.response["Error"]["Code"]
-                == "ConditionalCheckFailedException"
-            ):
-                logger.exception(e.response["Error"]["Message"])
-                raise ValueError("connection doesn't exists")
-            else:
-                raise
+        except ConditionalCheckFailedException:
+            raise ValueError("connection doesn't exists")
         else:
             return response
 
     def add_connection(self, connection_id: str) -> dict:
-        response = TABLE.update_item(
+        response = DYNAMO_TABLE.update_item(
             Key={"username": self.username, "event": "CONNECTIONS"},
             UpdateExpression="""\
             ADD content :conn
@@ -73,17 +67,14 @@ class User:
         return response
 
     def send_message(self, message: str, message_type: str):
-        message_type = message_type.upper()
-
-        if message_type not in self.MESSAGE_TYPES:
-            ERROR = f"unexpected value [{message_type=}]"
+        if message_type := message_type.upper() not in self.MESSAGE_TYPES:
             OUTPUT = {
-                "error": ERROR,
+                "error": f"unexpected value [{message_type=}]",
                 "expected_values": str(self.MESSAGE_TYPES),
             }
             raise ValueError(OUTPUT)
 
-        return TABLE.put_item(
+        return DYNAMO_TABLE.put_item(
             Item={
                 "username": self.username,
                 "event": f"{message_type} {uuid4()}",
@@ -98,11 +89,10 @@ class User:
 
     def _put_connection_set(self):
         try:
-            response = TABLE.put_item(
+            response = DYNAMO_TABLE.put_item(
                 Item={
                     "username": self.username,
                     "event": "CONNECTIONS",
-                    # "content": set([""]),
                     "metadata": {
                         "updated": int(datetime.now().timestamp()),
                         "registry_created": int(datetime.now().timestamp()),
@@ -111,21 +101,14 @@ class User:
                 ConditionExpression=Attr("event").not_exists(),
                 ReturnValues="NONE",
             )
-        except ClientError as e:
-            if (
-                e.response["Error"]["Code"]
-                == "ConditionalCheckFailedException"
-            ):
-                logger.exception(e.response["Error"]["Message"])
-                raise ValueError("user already exists")
-            else:
-                raise
+        except ConditionalCheckFailedException:
+            raise ValueError("user already exists")
         else:
             return response
 
     def _put_registered(self):
         try:
-            response = TABLE.put_item(
+            response = DYNAMO_TABLE.put_item(
                 Item={
                     "username": self.username,
                     "event": "REGISTERED",
@@ -137,15 +120,8 @@ class User:
                 ConditionExpression=Attr("username").not_exists(),
                 ReturnValues="NONE",
             )
-        except ClientError as e:
-            if (
-                e.response["Error"]["Code"]
-                == "ConditionalCheckFailedException"
-            ):
-                logger.exception(e.response["Error"]["Message"])
-                raise ValueError("user already exists")
-            else:
-                raise
+        except ConditionalCheckFailedException:
+            raise ValueError("user already exists")
         else:
             return response
 
