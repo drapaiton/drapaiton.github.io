@@ -3,10 +3,9 @@ from uuid import uuid4
 
 from boto3.dynamodb.conditions import Attr
 
-from src.common.config import (
-    ConditionalCheckFailedException,
-    DYNAMO_TABLE,
-)
+from src.common.config import Dynamo
+
+ConditionalCheckFailedException = Dynamo.ConditionalCheckFailedException
 
 
 class User:
@@ -14,7 +13,7 @@ class User:
 
     @property
     def is_registered(self):
-        response = DYNAMO_TABLE.get_item(
+        response = Dynamo.TABLE.get_item(
             Key={"username": self.username, "event": "REGISTERED"}
         )
         exists = bool(response.get("Item"))
@@ -35,7 +34,7 @@ class User:
 
     def disconnect(self, connection_id: str) -> dict:
         try:
-            response = DYNAMO_TABLE.update_item(
+            response = Dynamo.TABLE.update_item(
                 Key={"username": self.username, "event": "CONNECTIONS"},
                 UpdateExpression="""\
                 DELETE content :conn
@@ -53,7 +52,7 @@ class User:
             return response
 
     def add_connection(self, connection_id: str) -> dict:
-        response = DYNAMO_TABLE.update_item(
+        response = Dynamo.TABLE.update_item(
             Key={"username": self.username, "event": "CONNECTIONS"},
             UpdateExpression="""\
             ADD content :conn
@@ -67,14 +66,14 @@ class User:
         return response
 
     def send_message(self, message: str, message_type: str):
-        if message_type := message_type.upper() not in self.MESSAGE_TYPES:
+        if (message_type := message_type.upper()) not in self.MESSAGE_TYPES:
             OUTPUT = {
                 "error": f"unexpected value [{message_type=}]",
                 "expected_values": str(self.MESSAGE_TYPES),
             }
             raise ValueError(OUTPUT)
 
-        return DYNAMO_TABLE.put_item(
+        return Dynamo.TABLE.put_item(
             Item={
                 "username": self.username,
                 "event": f"{message_type} {uuid4()}",
@@ -89,7 +88,7 @@ class User:
 
     def _put_connection_set(self):
         try:
-            response = DYNAMO_TABLE.put_item(
+            response = Dynamo.TABLE.put_item(
                 Item={
                     "username": self.username,
                     "event": "CONNECTIONS",
@@ -108,7 +107,7 @@ class User:
 
     def _put_registered(self):
         try:
-            response = DYNAMO_TABLE.put_item(
+            response = Dynamo.TABLE.put_item(
                 Item={
                     "username": self.username,
                     "event": "REGISTERED",

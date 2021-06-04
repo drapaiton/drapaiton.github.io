@@ -1,6 +1,7 @@
 import logging
 from os import environ, getenv
 
+import boto3
 from boto3 import resource
 
 AWS_REGION = environ["AWS_DEFAULT_REGION"] = "us-east-2"
@@ -19,8 +20,23 @@ else:
     API_GATEWAY_URL = getenv("APIG_ENDPOINT")
     WEB_SOCKET_ENDPOINT = getenv("WEB_SOCKET_ENDPOINT")
 
-DYNAMO_RES = resource("dynamodb")
-DYNAMO_TABLE = DYNAMO_RES.Table("WebSocketUsers")
-ConditionalCheckFailedException = (
-    DYNAMO_RES.meta.client.exceptions.ConditionalCheckFailedException
-)
+
+class Dynamo:
+    RESOURCE = resource("dynamodb")
+    TABLE = RESOURCE.Table("WebSocketUsers")
+
+    ConditionalCheckFailedException = (
+        RESOURCE.meta.client.exceptions.ConditionalCheckFailedException
+    )
+
+
+class WebSocket:
+    ENDPOINT = WEB_SOCKET_ENDPOINT
+    CLIENT = boto3.client(
+        "apigatewaymanagementapi",
+        endpoint_url=WEB_SOCKET_ENDPOINT,
+        region_name=AWS_REGION,
+    )
+
+    GoneException = CLIENT.exceptions.GoneException
+    LimitExceededException = CLIENT.exceptions.LimitExceededException

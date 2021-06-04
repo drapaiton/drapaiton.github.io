@@ -7,7 +7,7 @@ def generate_policy(event):
         username = event["queryStringParameters"]["username"]
         if User(username).is_registered:
             response = {
-                "principalId": "username",
+                "principalId": username,
                 "policyDocument": {
                     "Version": "2012-10-17",
                     "Statement": [
@@ -22,7 +22,7 @@ def generate_policy(event):
             return response
         else:
             response = {
-                "principalId": "username",
+                "principalId": username,
                 "policyDocument": {
                     "Version": "2012-10-17",
                     "Statement": [

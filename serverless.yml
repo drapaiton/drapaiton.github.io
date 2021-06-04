@@ -34,7 +34,7 @@ provider:
     WEB_SOCKET_ENDPOINT:
       Fn::Join:
         - ''
-        - - wss://
+        - - https://
           - Ref: WebsocketsApi
           - .execute-api.
           - Ref: AWS::Region
@@ -66,6 +66,11 @@ provider:
             - Fn::GetAtt: [WebsocketUsersTable, Arn]
         - Effect: Allow
           Action:
+            - "execute-api:Invoke"
+          Resource:
+            - "*"
+        - Effect: Allow
+          Action:
             - "execute-api:ManageConnections"
           Resource:
             - "arn:aws:execute-api:*:*:**/@connections/*"
@@ -73,13 +78,6 @@ provider:
 functions:
     auth:
       handler: src/auth.handler
-      events:
-        - http:
-            path: /auth
-            integration: lambda
-            method: post
-            cors: false
-            private: false # Requires clients to add API keys values in the `x-api-key` header of their request
     websocket-connect:
         handler: src/web-socket.connect_handler
         events:
@@ -103,7 +101,7 @@ functions:
         handler: src/web-socket.writing_handler
         events:
             - websocket:
-                  route: message
+                  route: im_writing
     endpoint-register-user:
         handler: src/new_resource.register_user_handler
         events: # The Events that trigger this Function

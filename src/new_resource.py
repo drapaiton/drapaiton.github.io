@@ -1,10 +1,11 @@
-from src.common.WebSocketMessage import send
+from json import dumps
+
+from src.common.WebSocketMessage import send_everyone
 from src.common.responses import (
     AException,
     CreatedResource,
     UnprocessableEntity,
 )
-from src.dynamo.crud import get_all_online_users
 from src.dynamo.user import User
 
 
@@ -20,29 +21,33 @@ def register_user_handler(event, _):
         return AException(e).dict()
     else:
         MSG = "you successfully registered a user!"
-        return CreatedResource(message=MSG, created=user).dict()
+        return CreatedResource(message=MSG, created=str(user)).dict()
 
 
 def send_message_handler(event, _):
+    # TODO refactor the way we send messages
     print(event)
     body = event["body"]
 
     user = User(username=body["username"])
-    content = body["content"]
     message_type = body["message_type"]
+    content = dumps(body["content"])
     try:
-        created = user.send_message(message=content, message_type=message_type)
-        PAYLOAD = {
-            "username": user.username,
-            "content": content,
-            "message_type": message_type,
-        }
-        print(PAYLOAD)
-        send(PAYLOAD, list(get_all_online_users()))
+        # dynamodb
+        user.send_message(message=content, message_type=message_type)
+        send_everyone(user.username, content, message_type)
     except ValueError as e:
         return UnprocessableEntity(body=sum([], e.args)[0]).dict()
     except Exception as e:
         return AException(e).dict()
     else:
         MSG = "you successfully send a message!"
-        return CreatedResource(message=MSG, created=created).dict()
+        created = {
+            user.username: "username",
+            content: "content",
+            message_type: "message_type",
+        }
+        response = CreatedResource(message=MSG, created=created).dict()
+
+        print(response)
+        return response

@@ -3,7 +3,7 @@ from typing import Callable
 
 from boto3.dynamodb.conditions import Attr, Key
 
-from src.common.config import DYNAMO_TABLE as TABLE
+from src.common.config import Dynamo
 
 
 def _paginate_all(query: Callable):
@@ -19,7 +19,7 @@ def _paginate_all(query: Callable):
 def get_messages(
     username: str, date_from: datetime, date_to: datetime, **kwargs
 ) -> list:
-    response = TABLE.scan(
+    response = Dynamo.TABLE.scan(
         Select="ALL_ATTRIBUTES",
         FilterExpression=Key("username")
         .eq(username)
@@ -38,7 +38,7 @@ def get_messages(
 def get_videos(
     username: str, date_from: datetime, date_to: datetime, **kwargs
 ) -> list:
-    response = TABLE.scan(
+    response = Dynamo.TABLE.scan(
         Select="ALL_ATTRIBUTES",
         FilterExpression=Key("username")
         .eq(username)
@@ -56,7 +56,7 @@ def get_videos(
 
 
 def get_all_online_users(**kwargs) -> list:
-    response = TABLE.scan(
+    response = Dynamo.TABLE.scan(
         Select="ALL_ATTRIBUTES",
         FilterExpression=Key("event")
         .eq("CONNECTIONS")
@@ -69,7 +69,7 @@ def get_all_online_users(**kwargs) -> list:
 
 
 def get_connections(username, **kwargs) -> list:
-    response = TABLE.scan(
+    response = Dynamo.TABLE.scan(
         Select="ALL_ATTRIBUTES",
         FilterExpression=Key("event")
         .eq("CONNECTIONS")

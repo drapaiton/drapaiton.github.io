@@ -1,6 +1,5 @@
 # coding=utf-8
 
-from src.common.config import logger
 from src.common.responses import AException, CreatedResource
 from src.dynamo.user import User
 
@@ -9,17 +8,16 @@ def connect_handler(event: dict, _):
     print(event)
     connection_id = event["requestContext"]["connectionId"]
     username = event["queryStringParameters"]["username"]
-    try:
-        User(username=username).add_connection(connection_id)
-    except ValueError as e:
-        logger.exception(e)
+
+    User(username=username).add_connection(connection_id)
     return {"statusCode": 200}
 
 
 def writing_handler(event: dict, _):
     print(event)
     connection_id = event["requestContext"]["connectionId"]
-    username = event["queryStringParameters"]["username"]
+    username = event["requestContext"]["authorizer"]["principalId"]
+
     User(username=username)
     raise NotImplementedError()
 
@@ -32,9 +30,14 @@ def default_handler(event: dict, _):
 def disconnect_handler(event: dict, _):
     print(event)
     connection_id = event["requestContext"]["connectionId"]
-    username = event["queryStringParameters"]["username"]
+    username = event["requestContext"]["authorizer"]["principalId"]
+
     try:
         User(username=username).disconnect(connection_id)
-    except ValueError as e:
-        ...
-    return CreatedResource(created={}, message="disconnected").dict()
+    except ValueError:
+        disconnected = False
+    else:
+        disconnected = True
+    return CreatedResource(
+        created={"disconnected": disconnected}, message="goodbye !"
+    ).dict()
