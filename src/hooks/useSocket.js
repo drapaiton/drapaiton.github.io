@@ -4,6 +4,7 @@ const SOCKET_URL = process.env.REACT_APP_WSS_ADDRESS;
 
 const useSocket = () => {
   const [isPaused, setPause] = useState(false);
+  const [receivedMessage, setReceivedMessage] = useState(null);
   const socket = useRef(null);
 
   useEffect(() => {
@@ -23,6 +24,7 @@ const useSocket = () => {
       if (isPaused) return;
       const message = e.data;
       console.log("e", message);
+      setReceivedMessage(message);
     };
   }, [isPaused]);
 
@@ -35,7 +37,7 @@ const useSocket = () => {
     );
   };
 
-  return { handleSendMessage };
+  return { handleSendMessage, receivedMessage };
 };
 
 export default useSocket;

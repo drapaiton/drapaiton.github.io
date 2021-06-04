@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -8,6 +9,8 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Checkbox from "@material-ui/core/Checkbox";
 import Avatar from "@material-ui/core/Avatar";
 
+import Image from "../../assets/guy.jpg";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -16,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CheckboxListSecondary() {
+const Dialog = ({ message }) => {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([1]);
 
@@ -35,11 +38,11 @@ export default function CheckboxListSecondary() {
 
   return (
     <List dense className={classes.root}>
-      <ListItem key={value} button>
+      <ListItem button>
         <ListItemAvatar>
-          <Avatar alt="guy" src="../../assets/guy.jpg" />
+          <Avatar alt="guy" src={Image} />
         </ListItemAvatar>
-        <ListItemText id={labelId} primary={`Line item ${value + 1}`} />
+        <ListItemText id="chat" primary={message} />
         {/*<ListItemSecondaryAction>
               <Checkbox
                 edge="end"
@@ -51,4 +54,14 @@ export default function CheckboxListSecondary() {
       </ListItem>
     </List>
   );
-}
+};
+
+Dialog.propTypes = {
+  message: PropTypes.string,
+};
+
+Dialog.defaultProps = {
+  message: "",
+};
+
+export default Dialog;

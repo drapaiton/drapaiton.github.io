@@ -7,6 +7,7 @@ import ChatZone from "../ChatZone";
 import ChatInformation from "../ChatInformation";
 import MessageContext from "../../context/messages/MessagesContext";
 
+import "./styles.css";
 import useMessages from "./hooks/useMessages";
 
 const useStyles = makeStyles((theme) => ({
@@ -15,13 +16,23 @@ const useStyles = makeStyles((theme) => ({
   },
   body: {
     height: "600px",
+    overflowY: "scroll",
+    overflowX: "hidden",
+    scrollbarColor: "thistle white",
+    scrollbarWidth: "thin",
+    //transform: "rotate(180deg)",
   },
   footer: {},
 }));
 
 const ChatArea = () => {
-  const { message, handleSetMessage } = useMessages();
-  const { sendMessage } = useContext(MessageContext);
+  const {
+    message,
+    handleSetMessage,
+    paintEmoji,
+    handleSetPaintEmoji,
+  } = useMessages();
+  const { sendMessage, pushMessage } = useContext(MessageContext);
   const classes = useStyles();
 
   const onHandleChange = (event) => {
@@ -31,12 +42,11 @@ const ChatArea = () => {
 
   const onHandleKeyDown = (event) => {
     if (event.keyCode === 13) {
-      handleSetMessage("");
+      pushMessage(message);
       sendMessage(message);
+      handleSetMessage("");
     }
   };
-
-  const onHandleEmojiClick = (event) => {};
 
   return (
     <Grid
@@ -48,14 +58,16 @@ const ChatArea = () => {
       <Grid item className={classes.title}>
         <ChatInformation />
       </Grid>
-      <Grid item className={classes.body}>
+      <Grid item className={`${classes.body} hannah-chatarea__container`}>
         <ChatZone />
       </Grid>
       <Grid item className={classes.footer}>
         <TextBox
+          handleSetEmoji={handleSetPaintEmoji}
+          message={message}
+          inputValue={message}
           handleChange={(e) => onHandleChange(e)}
           handleKeyDown={(e) => onHandleKeyDown(e)}
-          handleEmojiClick={(e) => onHandleEmojiClick(e)}
         />
       </Grid>
     </Grid>

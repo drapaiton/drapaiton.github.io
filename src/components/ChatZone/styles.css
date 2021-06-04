@@ -1,5 +1,60 @@
+.hannah-chatzone {
+}
 
-.hannah-chatzone-wlp {
-  background-image: url("../../assets/bg.jpeg");
+.hannah-chatzone__sent {
   height: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  bottom: 400px;
+  position: relative;
+  top: 400px;
+  left: 450px;
+  width: 350px;
+  margin: 15px 0;
+  position: relative;
+  font-size: 18px;
+  max-width: 600px;
+}
+
+.hannah-chatzone__sent:after {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: auto;
+  right: -20px;
+  top: 0;
+  bottom: auto;
+  border: 32px solid;
+  border-color: #FFF transparent transparent transparent;
+}
+
+.hannah-chatzone__received {
+  height: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  bottom: 400px;
+  position: relative;
+  top: 400px;
+  left: 20px;
+  width: 350px;
+  margin: 15px 0;
+  position: relative;
+  font-size: 18px;
+  max-width: 600px;
+}
+
+.hannah-chatzone__received:after {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: -20px;
+  right: auto;
+  top: 0px;
+  bottom: auto;
+  border: 22px solid;
+  border-color: white transparent transparent transparent;
 }
