@@ -7,8 +7,6 @@ const useEmoticons = () => {
     setShowEmoticons(!value);
   };
 
-  useEffect(() => {}, []);
-
   return {
     showEmoticons,
     setEmoticons,

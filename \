@@ -10,8 +10,8 @@ import { PUSH_MESSAGE } from "./constants";
 
 const MessagesState = ({ children }) => {
   const { receivedMessage } = useSocket();
-  const { fetch, handleFetch } = useAPI();
-  console.log("response---------------------", fetch);
+  const { response, handleFetch } = useAPI();
+  console.log("response---------------------", response);
 
   const initialState = {
     messages: [],
@@ -38,8 +38,8 @@ const MessagesState = ({ children }) => {
   return (
     <MessageContext.Provider
       value={{
-        sendMessage: handleFetch,
-        receivedMessage: receivedMessage,
+        sendMessage: handleSendMessage,
+        receivedMessage: handleFetch,
         pushMessage: pushMessage,
         listMessages: state.messages,
       }}

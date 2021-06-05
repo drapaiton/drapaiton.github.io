@@ -1,15 +1,15 @@
 
 .hannah-chat__container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background-color: #1e2428;
   height: 70px;
-  justify-content: flex-end;
 }
 
 .hannah-chat__container > section.emoji-mart.emoji-mart-light {
   position: relative;
-  bottom: 5px;
+  bottom: 310px;
+  right: 65px;
 }
 
 .hannah-chat__input {
@@ -21,17 +21,18 @@
 }
 
 .hannah-chat__emojis {
-  display: flex;
-  color: aquamarine;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
+  position: absolute;
+  top: 538px;
 }
 
-.hannah-chat__emojis:hover {
-  cursor: pointer;
+.emoji-mart-category-list > li {
+  cursor: pointer !important;
 }
 
-.emoji-mart-bar {
-  display: none;
+.emoji-mart-category-list > li > button {
+  cursor: pointer !important;
+}
+
+.emoji-mart-category-list > li > button > span {
+  cursor: pointer !important;
 }

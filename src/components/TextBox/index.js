@@ -1,11 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Grid from "@material-ui/core/Grid";
+import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
 import InputBase from "@material-ui/core/InputBase";
 import { makeStyles } from "@material-ui/core/styles";
-import EmojiPicker from "emoji-picker-react";
-import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
-import SpeedDial from "../../containers/SpeedDial";
+import IconButton from "@material-ui/core/IconButton";
+import EmojiEmotionsTwoToneIcon from "@material-ui/icons/EmojiEmotionsTwoTone";
 
 import "./styles.css";
 import useEmoticons from "./hooks/useEmoticons";
@@ -23,19 +23,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TextBox = ({ handleChange, handleKeyDown, handleEmojiClick }) => {
+const TextBox = ({ message, handleChange, handleKeyDown, handleSetEmoji }) => {
   const { showEmoticons, setEmoticons } = useEmoticons();
   const classes = useStyles();
 
   return (
-    <Grid container className="hannah-chat__container">
-      <Grid item xs={1}>
-        {(!showEmoticons && <SpeedDial />) || (
-          <EmojiPicker onEmojiClick={handleEmojiClick} />
-        )}
-      </Grid>
-      <Grid item xs>
+    <>
+      <div className="hannah-chat__emojis">
+        {showEmoticons && <Picker onSelect={(e) => handleSetEmoji(e)} />}
+      </div>
+      <div className="hannah-chat__container">
+        <IconButton
+          color="primary"
+          aria-label="add to shopping cart"
+          onClick={() => setEmoticons(showEmoticons)}
+        >
+          <EmojiEmotionsTwoToneIcon fontSize="large" />
+        </IconButton>
         <InputBase
+          value={message}
           onKeyDown={handleKeyDown}
           onChange={handleChange}
           className={`${classes.text} hannah-chat__input`}
@@ -43,8 +49,8 @@ const TextBox = ({ handleChange, handleKeyDown, handleEmojiClick }) => {
           placeholder="Write Something"
           inputProps={{ "aria-label": "Write Something" }}
         />
-      </Grid>
-    </Grid>
+      </div>
+    </>
   );
 };
 
