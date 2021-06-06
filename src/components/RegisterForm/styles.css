@@ -1,0 +1,19 @@
+.hannah-register {
+  width: 250px;
+  height: 250px;
+  padding: 1.5rem;
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hannah-register__registerForm {
+  font-size: 14;
+}
+
+.hannah-register__container {
+  flex-direction: row;
+  display: flex;
+  justify-content: center
+}

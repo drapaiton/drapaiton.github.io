@@ -3,15 +3,12 @@ import PropTypes from "prop-types";
 
 import MessageContext from "./MessagesContext";
 import useSocket from "../../hooks/useSocket";
-import useAPI from "../../hooks/useAPI";
 
 import MessagesReducer from "./MessagesReducer";
 import { PUSH_MESSAGE } from "./constants";
 
 const MessagesState = ({ children }) => {
   const { receivedMessage } = useSocket();
-  const { fetch, handleFetch } = useAPI();
-  console.log("response---------------------", fetch);
 
   const initialState = {
     messages: [],
@@ -38,7 +35,7 @@ const MessagesState = ({ children }) => {
   return (
     <MessageContext.Provider
       value={{
-        sendMessage: handleFetch,
+        sendMessage: () => {},
         receivedMessage: receivedMessage,
         pushMessage: pushMessage,
         listMessages: state.messages,

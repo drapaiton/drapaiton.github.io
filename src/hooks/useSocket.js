@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const SOCKET_URL = process.env.REACT_APP_WSS_ADDRESS;
+const SOCKET_URL = `${process.env.REACT_APP_WSS_MESSAGE_RECEIVE}?username=hannah`;
 
 const useSocket = () => {
   const [isPaused, setPause] = useState(false);

@@ -1,7 +1,10 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
+import RegisterForm from "../components/RegisterForm";
 import ChatContainer from "../components/ChatContainer";
+
+import useStorage from "../hooks/useStorage";
 
 const useStyles = makeStyles((theme) => ({
   outer: {
@@ -23,13 +26,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const App = () => {
+  const { storage, setUserName, checkUserName, setLocalstorage } = useStorage();
+
+  const onHandleClick = (value) => {
+    setLocalstorage(value);
+  };
+
+  const renderOption = () => {
+    if (storage) {
+      return <ChatContainer />;
+    }
+    return <RegisterForm handleClick={(e) => onHandleClick(e)} />;
+  };
+
   const classes = useStyles();
   return (
     <div className={classes.outer}>
       <div className={classes.middle}>
-        <div className={classes.inner}>
-          <ChatContainer />
-        </div>
+        <div className={classes.inner}>{renderOption()}</div>
       </div>
     </div>
   );

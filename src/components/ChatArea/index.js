@@ -9,8 +9,7 @@ import MessageContext from "../../context/messages/MessagesContext";
 
 import "./styles.css";
 import useMessages from "./hooks/useMessages";
-
-const POST_URL = process.env.REACT_APP_MESSAGES_POST;
+import useFetch from "./hooks/useFetch";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -29,12 +28,23 @@ const useStyles = makeStyles((theme) => ({
 
 const ChatArea = () => {
   const {
+    shot,
+    method,
+    payload,
     message,
-    handleSetMessage,
     paintEmoji,
+    handleSetShot,
+    handleSetMessage,
+    handleSendMessage,
     handleSetPaintEmoji,
   } = useMessages();
+
+  const POST_URL = shot && process.env.REACT_APP_MESSAGES_POST;
+
   const { sendMessage, pushMessage } = useContext(MessageContext);
+  const { data } = useFetch(payload, method, POST_URL);
+  console.log("data-------", data);
+
   const classes = useStyles();
 
   const onHandleChange = (event) => {
@@ -43,30 +53,10 @@ const ChatArea = () => {
   };
 
   const onHandleKeyDown = (event) => {
-    const messageJSON = {
-      username: "hannah",
-      content: message,
-      message_type: "MESSAGE",
-    };
     if (event.keyCode === 13) {
+      handleSendMessage(message, "POST");
       pushMessage(message);
-      fetch(POST_URL, {
-        method: "POST",
-        mode: "no-cors",
-        cache: "no-cache",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        redirect: "follow",
-        referrerPolicy: "no-referrer",
-        body: JSON.stringify({ body: messageJSON }),
-      })
-        .then((response) => response)
-        .then((payload) => {
-          console.log(payload.json());
-        });
-      //sendMessage(messageJSON, "POST", POST_URL);
+      handleSetShot(true);
       handleSetMessage("");
     }
   };
